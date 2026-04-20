@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Purchase Frequency — Equestrian Labs</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+[data-theme="light"]{
+  --bg:#F0EEE9;--sf:#FFFFFF;--sf2:#F5F3EF;--sf3:#EAE8E3;
+  --bd:#DEDAD3;--bd2:#C5C1B8;--tx:#0F0E0C;--tx2:#58564F;--tx3:#8E8C85;
+  --1x:#1450A8;--1x-bg:#E6F1FB;--1x-bd:rgba(20,80,168,.18);
+  --2x:#7D5E0E;--2x-bg:#FEF3D2;--2x-bd:rgba(125,94,14,.18);
+  --3x:#0C7050;--3x-bg:#D2F0E4;--3x-bd:rgba(12,112,80,.18);
+  --ecom:#1450A8;--conc:#534AB7;--pos:#7D5E0E;
+}
+[data-theme="dark"]{
+  --bg:#0A0A09;--sf:#141412;--sf2:#1C1C1A;--sf3:#242422;
+  --bd:#2A2A28;--bd2:#3C3C3A;--tx:#F0EFE8;--tx2:#C0BEB7;--tx3:#72706A;
+  --1x:#72AEFF;--1x-bg:#0C1E38;--1x-bd:rgba(114,174,255,.2);
+  --2x:#D8B054;--2x-bg:#2A2008;--2x-bd:rgba(216,176,84,.2);
+  --3x:#2EE896;--3x-bg:#0A3020;--3x-bd:rgba(46,232,150,.2);
+  --ecom:#72AEFF;--conc:#A090FF;--pos:#D8B054;
+}
+html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);font-size:14px}
+.wrap{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
+
+/* ── HEADER ── */
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.brand-row{display:flex;align-items:flex-start;gap:8px}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--3x);margin-top:3px;flex-shrink:0}
+.brand-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:-.02em}
+.brand-sub{font-size:10px;color:var(--tx3);margin-top:1px}
+h1{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-top:10px}
+h1 span{color:var(--3x)}
+.period-info{font-size:11px;color:var(--tx3);margin-top:5px}
+
+/* ── CONTROLS ── */
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.sel-group{display:flex;flex-direction:column;gap:3px}
+.sel-label{font-size:9px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em}
+select.psel{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--tx);
+  background:var(--sf2);border:1px solid var(--bd2);border-radius:6px;
+  padding:5px 26px 5px 10px;cursor:pointer;outline:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+  min-width:110px;transition:border-color .12s}
+select.psel:focus{border-color:var(--3x)}
+.rfbtn{display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:6px;
+  border:1px solid var(--bd2);background:var(--sf2);color:var(--tx2);cursor:pointer;
+  font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;transition:all .12s}
+.rfbtn:hover{border-color:var(--3x);color:var(--3x)}
+.tbtn{width:28px;height:28px;border-radius:50%;border:1px solid var(--bd2);background:var(--sf2);
+  color:var(--tx2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+.dv{width:1px;height:32px;background:var(--bd2)}
+
+/* ── SECTION ── */
+.sec{display:flex;align-items:center;gap:8px;margin:28px 0 12px}
+.sn{font-size:9px;font-weight:700;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;font-family:'Syne',sans-serif;white-space:nowrap}
+.sl{flex:1;height:1px;background:var(--bd)}
+.st{font-size:9px;font-weight:600;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+
+/* ── KPI CARDS ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:20px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:13px 15px;position:relative;overflow:hidden}
+.card-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:10px 10px 0 0}
+.card-l{font-size:10px;color:var(--tx3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px}
+.card-v{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.card-s{font-size:10px;color:var(--tx3);margin-top:4px}
+
+/* ── FREQUENCY BARS (visual) ── */
+.freq-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px}
+.freq-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;overflow:hidden;position:relative}
+.freq-card-1x{border-top:3px solid var(--1x)}
+.freq-card-2x{border-top:3px solid var(--2x)}
+.freq-card-3x{border-top:3px solid var(--3x)}
+.freq-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.freq-label-1x{color:var(--1x)}
+.freq-label-2x{color:var(--2x)}
+.freq-label-3x{color:var(--3x)}
+.freq-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.04em;line-height:1}
+.freq-num-1x{color:var(--1x)}
+.freq-num-2x{color:var(--2x)}
+.freq-num-3x{color:var(--3x)}
+.freq-sub{font-size:11px;color:var(--tx3);margin-top:4px}
+.freq-bar-wrap{margin-top:12px;height:4px;background:var(--sf3);border-radius:2px;overflow:hidden}
+.freq-bar-fill{height:100%;border-radius:2px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.freq-rev{font-size:11px;color:var(--tx2);margin-top:10px;padding-top:10px;border-top:1px solid var(--bd)}
+.freq-rev span{font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
+
+/* ── CHART WRAPPER ── */
+.chart-box{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.chart-title{font-size:12px;font-weight:600;color:var(--tx2)}
+.chart-note{font-size:10px;color:var(--tx3)}
+.chart-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--tx3)}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* ── MONTHLY TABLE ── */
+.tbl-wrap{background:var(--sf);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+.tbl-head{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--bd)}
+.tbl-title{font-size:12px;font-weight:600;color:var(--tx2)}
+.tbl-note{font-size:10px;color:var(--tx3)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{padding:7px 12px;text-align:left;font-size:9px;font-weight:700;color:var(--tx3);
+  letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--bd);background:var(--sf2);white-space:nowrap}
+thead th.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--bd);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--sf2)}
+td{padding:8px 12px;color:var(--tx2);vertical-align:middle}
+td.r{text-align:right;font-family:'DM Mono',monospace;font-size:11px;color:var(--tx)}
+td.mo{color:var(--tx);font-weight:500}
+.act-bar{display:flex;align-items:center;gap:6px;min-width:130px}
+.act-bg{flex:1;height:4px;background:var(--sf3);border-radius:2px;overflow:hidden}
+.act-fill{height:100%;border-radius:2px}
+.act-n{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);min-width:32px;text-align:right}
+
+/* ── COHORT ── */
+.cohort-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.cohort-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.cohort-name{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:10px}
+.cohort-total{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--tx);margin-bottom:12px}
+.ret-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:11px}
+.ret-label{color:var(--tx3)}
+.ret-val{font-family:'DM Mono',monospace;font-weight:500}
+.ret-bar-wrap{height:3px;background:var(--sf3);border-radius:2px;overflow:hidden;margin-top:3px;margin-bottom:6px}
+.ret-bar-fill{height:100%;border-radius:2px;transition:width .5s}
+
+/* ── CHANNEL COMPARE ── */
+.ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.chc{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.chc-name{font-size:10px;color:var(--tx3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.chc-freq{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:2px}
+.chc-sub{font-size:10px;color:var(--tx3);margin-bottom:10px}
+.chc-buckets{display:flex;flex-direction:column;gap:5px}
+.chc-row{display:flex;align-items:center;gap:6px;font-size:11px}
+.chc-lbl{color:var(--tx3);min-width:24px}
+.chc-bbar{flex:1;height:4px;background:var(--sf3);border-radius:2px;overflow:hidden}
+.chc-bfill{height:100%;border-radius:2px}
+.chc-pct{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);min-width:32px;text-align:right}
+
+/* ── LOADING/EMPTY ── */
+.ov{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);
+  z-index:50;align-items:center;justify-content:center;border-radius:10px}
+.ov.show{display:flex}
+.spi{width:22px;height:22px;border:2px solid var(--bd2);border-top-color:var(--3x);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.empty{padding:28px;text-align:center;font-size:12px;color:var(--tx3)}
+.no-data{font-size:11px;color:var(--tx3);text-align:center;padding:20px}
+
+@media(max-width:640px){
+  h1{font-size:20px}.wrap{padding:16px 14px 40px}
+  .freq-grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}
+  table{font-size:11px}td,thead th{padding:6px 8px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="brand-row">
+        <div class="brand-dot"></div>
+        <div><div class="brand-name">Equestrian Labs — Corro</div><div class="brand-sub">Purchase Frequency · Shopify API → Google Sheets</div></div>
+      </div>
+      <h1>Purchase <span>Frequency</span></h1>
+      <div class="period-info" id="period-info">Select a year above</div>
+    </div>
+    <div class="controls">
+      <div class="sel-group">
+        <div class="sel-label">Year</div>
+        <select class="psel" id="sel-year" onchange="render()"></select>
+      </div>
+      <div class="dv"></div>
+      <button class="rfbtn" onclick="forceRefresh()">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M10 6a4 4 0 1 1-.8-2.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 2v2.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Refresh
+      </button>
+      <button class="tbtn" onclick="toggleTheme()">☀</button>
+    </div>
+  </div>
+
+  <!-- KPI SUMMARY -->
+  <div class="cards">
+    <div class="card"><div class="card-accent" style="background:var(--3x)"></div><div class="card-l">Total Customers</div><div class="card-v" id="s-total">—</div><div class="card-s">unique buyers this year</div></div>
+    <div class="card"><div class="card-accent" style="background:var(--2x)"></div><div class="card-l">Avg Orders / Customer</div><div class="card-v" id="s-avg">—</div><div class="card-s">Ceci target: ~2.8</div></div>
+    <div class="card"><div class="card-accent" style="background:var(--1x)"></div><div class="card-l">One-time Buyers</div><div class="card-v" id="s-1x">—</div><div class="card-s">bought only once</div></div>
+    <div class="card"><div class="card-accent" style="background:var(--3x)"></div><div class="card-l">Loyal Buyers (3x+)</div><div class="card-v" id="s-3x">—</div><div class="card-s">3 or more orders</div></div>
+    <div class="card"><div class="card-accent" style="background:var(--tx3)"></div><div class="card-l">Total Revenue</div><div class="card-v" id="s-rev">—</div></div>
+    <div class="card"><div class="card-accent" style="background:var(--tx3)"></div><div class="card-l">Updated</div><div class="card-v" style="font-size:13px;margin-top:2px" id="s-upd">—</div></div>
+  </div>
+
+  <!-- FREQUENCY DISTRIBUTION -->
+  <div class="sec"><div class="sn">01</div><div class="sl"></div><div class="st">Frequency distribution — how many times did each customer buy?</div></div>
+  <div class="freq-grid" id="freq-cards">
+    <div class="freq-card freq-card-1x"><div class="freq-label freq-label-1x">1x — bought once</div><div class="freq-num freq-num-1x" id="f1-n">—</div><div class="freq-sub" id="f1-pct">of all customers</div><div class="freq-bar-wrap"><div class="freq-bar-fill" id="f1-bar" style="background:var(--1x)"></div></div><div class="freq-rev">Revenue: <span id="f1-rev">—</span> <span id="f1-rpct" style="color:var(--tx3)"></span></div></div>
+    <div class="freq-card freq-card-2x"><div class="freq-label freq-label-2x">2x — bought twice</div><div class="freq-num freq-num-2x" id="f2-n">—</div><div class="freq-sub" id="f2-pct">of all customers</div><div class="freq-bar-wrap"><div class="freq-bar-fill" id="f2-bar" style="background:var(--2x)"></div></div><div class="freq-rev">Revenue: <span id="f2-rev">—</span> <span id="f2-rpct" style="color:var(--tx3)"></span></div></div>
+    <div class="freq-card freq-card-3x"><div class="freq-label freq-label-3x">3x+ — loyal buyers</div><div class="freq-num freq-num-3x" id="f3-n">—</div><div class="freq-sub" id="f3-pct">of all customers</div><div class="freq-bar-wrap"><div class="freq-bar-fill" id="f3-bar" style="background:var(--3x)"></div></div><div class="freq-rev">Revenue: <span id="f3-rev">—</span> <span id="f3-rpct" style="color:var(--tx3)"></span></div></div>
+  </div>
+
+  <!-- BAR CHART: Distribution visual -->
+  <div class="chart-box" style="margin-bottom:8px">
+    <div class="chart-header">
+      <div class="chart-title">Customers vs Revenue by frequency bucket</div>
+      <div class="chart-note" id="chart-note">—</div>
+    </div>
+    <div class="chart-legend" id="dist-legend"></div>
+    <div style="position:relative;height:200px"><canvas id="distChart" role="img" aria-label="Bar chart comparing customer count and revenue share by frequency bucket">Frequency distribution chart</canvas></div>
+  </div>
+
+  <!-- SECTION 2: MONTHLY ACTIVE -->
+  <div class="sec"><div class="sn">02</div><div class="sl"></div><div class="st">Monthly active customers — must match ~400-600 seen in Shopify</div></div>
+  <div class="tbl-wrap">
+    <div class="tbl-head">
+      <div class="tbl-title">Active customers per month</div>
+      <div class="tbl-note">New = first purchase this year · Returning = already bought before</div>
+    </div>
+    <div id="monthly-table"><div class="empty">Select a year above</div></div>
+  </div>
+
+  <!-- LINE CHART: Monthly trend -->
+  <div class="chart-box" style="margin-top:8px">
+    <div class="chart-header">
+      <div class="chart-title">Monthly customer activity trend</div>
+      <div class="chart-note">New vs Returning buyers per month</div>
+    </div>
+    <div class="chart-legend" id="monthly-legend">
+      <span class="leg-item"><span class="leg-dot" style="background:#72AEFF"></span>Total active</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#2EE896"></span>New customers</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#D8B054"></span>Returning customers</span>
+    </div>
+    <div style="position:relative;height:220px"><canvas id="monthlyChart" role="img" aria-label="Line chart of monthly active customers">Monthly customer trend</canvas></div>
+  </div>
+
+  <!-- SECTION 3: BY CHANNEL -->
+  <div class="sec"><div class="sn">03</div><div class="sl"></div><div class="st">By sales channel — Ecom vs Concierge loyalty comparison</div></div>
+  <div class="ch-grid" id="ch-grid"><div class="no-data">Select a year above</div></div>
+
+  <!-- SECTION 4: COHORT RETENTION -->
+  <div class="sec"><div class="sn">04</div><div class="sl"></div><div class="st">Cohort retention — of Q1 buyers, how many came back?</div></div>
+  <div class="cohort-grid" id="cohort-grid"><div class="no-data">Select a year above (requires --skip-cohort=false when running pipeline)</div></div>
+
+  <div style="margin-top:24px;font-size:10px;color:var(--tx3);text-align:center">
+    Google Sheets ← frequency_v1.py ← Shopify API &nbsp;·&nbsp; <span id="footer-lbl">—</span>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const SHEET_ID = "1NnH7Ln3HP9AuJ5ohxgvVk6A5BnG9_iz9WPC9SxaaidI";
+const AKEY    = "AIzaSyD8oIf_TyxchEkU_MpKJXngrjrMVyV81oY";
+const START_Y = 2024;
+const CY      = new Date().getFullYear();
+let cache     = {};
+let distChartInst = null, moChartInst = null;
+const $ = id => document.getElementById(id);
+
+function fmt$(v){
+  const n = parseFloat(v)||0;
+  if(n>=1e6) return "$"+(n/1e6).toFixed(2)+"M";
+  if(n>=1000) return "$"+(n/1000).toFixed(1)+"K";
+  return "$"+Math.round(n).toLocaleString();
+}
+function fmtN(v){ const n=parseInt(v)||0; return n.toLocaleString(); }
+function fmtP(v){ return (parseFloat(v)||0).toFixed(1)+"%"; }
+
+function buildYears(){
+  const sel=$("sel-year"); sel.innerHTML="";
+  for(let y=CY;y>=START_Y;y--){
+    const o=document.createElement("option");
+    o.value=y; o.textContent=y;
+    if(y===2025) o.selected=true;
+    sel.appendChild(o);
+  }
+}
+
+async function fetchTab(tab){
+  if(cache[tab]) return cache[tab];
+  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(tab)}?key=${AKEY}`;
+  try{
+    const r=await fetch(url); if(!r.ok) throw new Error(r.status);
+    const d=await r.json(); const rows=d.values||[];
+    if(rows.length<2) return [];
+    const h=rows[0];
+    const res=rows.slice(1).map(row=>{const o={};h.forEach((hh,i)=>o[hh]=row[i]||"");return o;});
+    cache[tab]=res; setTimeout(()=>delete cache[tab],5*60*1000);
+    return res;
+  }catch(e){console.error(tab,e);return[];}
+}
+
+function filterYear(rows,year,yearCol="year"){
+  const yStr=String(year);
+  return rows.filter(r=>(r[yearCol]||r.period||"").includes(yStr));
+}
+
+function isDark(){return document.documentElement.getAttribute("data-theme")==="dark"}
+
+// ── RENDER KPI SUMMARY ────────────────────────────────────────────
+function renderSummary(distRows){
+  if(!distRows.length){
+    ["s-total","s-avg","s-1x","s-3x","s-rev","s-upd"].forEach(id=>$(id).textContent="—");
+    return;
+  }
+  let totalCust=0, total1x=0, total3x=0, totalRev=0, totalOrd=0;
+  distRows.forEach(r=>{
+    const c=parseInt(r.customers||0), rev=parseFloat(r.net_sales||0), ord=parseInt(r.orders||0);
+    totalCust+=c; totalRev+=rev; totalOrd+=ord;
+    if((r.frequency_bucket||"").startsWith("1x")) total1x=c;
+    if((r.frequency_bucket||"").startsWith("3x")) total3x=c;
+  });
+  const avgFreq = totalCust ? (totalOrd/totalCust).toFixed(2) : "—";
+  $("s-total").textContent = fmtN(totalCust);
+  $("s-avg").textContent   = avgFreq+"x";
+  $("s-1x").textContent    = fmtN(total1x);
+  $("s-3x").textContent    = fmtN(total3x);
+  $("s-rev").textContent   = fmt$(totalRev);
+  $("s-upd").textContent   = (distRows[0]?.updated_at||"").slice(0,10)||"—";
+}
+
+// ── RENDER FREQ CARDS ─────────────────────────────────────────────
+function renderFreqCards(distRows){
+  const map={};
+  distRows.forEach(r=>{ map[r.frequency_bucket]=r; });
+  const buckets=[
+    {key:"1x — bought once",   ids:["f1-n","f1-pct","f1-bar","f1-rev","f1-rpct"]},
+    {key:"2x — bought twice",  ids:["f2-n","f2-pct","f2-bar","f2-rev","f2-rpct"]},
+    {key:"3x+ — loyal buyers", ids:["f3-n","f3-pct","f3-bar","f3-rev","f3-rpct"]},
+  ];
+  buckets.forEach(({key,ids})=>{
+    const r=map[key]||{};
+    $(ids[0]).textContent = fmtN(r.customers||0);
+    $(ids[1]).textContent = fmtP(r.pct_customers||0)+" of customers";
+    $(ids[2]).style.width = Math.min(parseFloat(r.pct_customers||0),100)+"%";
+    $(ids[3]).textContent = fmt$(r.net_sales||0);
+    $(ids[4]).textContent = "("+fmtP(r.pct_revenue||0)+")";
+  });
+}
+
+// ── RENDER DIST CHART ─────────────────────────────────────────────
+function renderDistChart(distRows){
+  const dark=isDark();
+  const labels=distRows.map(r=>r.frequency_bucket?.replace(" — "," ") || "");
+  const custData=distRows.map(r=>parseInt(r.customers||0));
+  const revPct=distRows.map(r=>parseFloat(r.pct_revenue||0));
+  const COLORS=["#72AEFF","#D8B054","#2EE896"];
+  const DARK_TXT=dark?"#C0BEB7":"#58564F";
+  const GRID=dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)";
+
+  if(distChartInst){distChartInst.destroy();distChartInst=null;}
+  distChartInst=new Chart($("distChart"),{
+    type:"bar",
+    data:{
+      labels,
+      datasets:[
+        {label:"Customers",data:custData,backgroundColor:COLORS,borderRadius:4,yAxisID:"y"},
+        {label:"Revenue %",data:revPct,type:"line",borderColor:"#F06868",backgroundColor:"rgba(240,104,104,.15)",
+         pointBackgroundColor:"#F06868",pointRadius:4,yAxisID:"y2",tension:.3},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{
+        label:ctx=>ctx.datasetIndex===0?`${ctx.parsed.y.toLocaleString()} customers`:`${ctx.parsed.y.toFixed(1)}% of revenue`
+      }}},
+      scales:{
+        x:{grid:{color:GRID},ticks:{color:DARK_TXT,font:{size:11}}},
+        y:{grid:{color:GRID},ticks:{color:DARK_TXT,font:{size:10}},title:{display:true,text:"Customers",color:DARK_TXT,font:{size:10}}},
+        y2:{position:"right",grid:{display:false},ticks:{color:"#F06868",font:{size:10},callback:v=>v+"%"},
+          title:{display:true,text:"Revenue %",color:"#F06868",font:{size:10}}},
+      }
+    }
+  });
+  $("dist-legend").innerHTML=`
+    <span class="leg-item"><span class="leg-dot" style="background:#72AEFF"></span>Customer count</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#D8B054"></span>Customers (2x)</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#2EE896"></span>Customers (3x+)</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#F06868;border-radius:50%"></span>Revenue % (line)</span>`;
+  $("chart-note").textContent=`${distRows.reduce((a,r)=>a+parseInt(r.customers||0),0).toLocaleString()} total customers`;
+}
+
+// ── RENDER MONTHLY TABLE ──────────────────────────────────────────
+function renderMonthlyTable(rows){
+  const el=$("monthly-table");
+  if(!rows.length){el.innerHTML=`<div class="empty">No monthly data. Run pipeline first.</div>`;return;}
+  const maxActive=Math.max(...rows.map(r=>parseInt(r.total_active_customers||0)))||1;
+  const MNAMES={
+    "01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun",
+    "07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec"
+  };
+  el.innerHTML=`<table>
+    <thead><tr>
+      <th>Month</th>
+      <th class="r">Active</th>
+      <th class="r">New</th>
+      <th class="r">Returning</th>
+      <th>Active customers bar</th>
+      <th class="r">Orders</th>
+      <th class="r">Revenue</th>
+      <th class="r">Avg Orders</th>
+    </tr></thead>
+    <tbody>${rows.map(r=>{
+      const mo=(r.month||"").slice(5,7);
+      const moLabel=(MNAMES[mo]||mo)+" "+(r.month||"").slice(0,4);
+      const active=parseInt(r.total_active_customers||0);
+      const newC=parseInt(r.new_customers||0);
+      const retC=parseInt(r.returning_customers||0);
+      const pct=Math.round(active/maxActive*100);
+      const warn=active<200?"color:var(--tx3);font-style:italic":"";
+      return `<tr>
+        <td class="mo">${moLabel}</td>
+        <td class="r" style="${warn}">${fmtN(active)}</td>
+        <td class="r" style="color:var(--3x)">${fmtN(newC)}</td>
+        <td class="r" style="color:var(--2x)">${fmtN(retC)}</td>
+        <td><div class="act-bar">
+          <div class="act-bg"><div class="act-fill" style="width:${pct}%;background:${active>=400?"var(--3x)":"var(--2x)"}"></div></div>
+          <span class="act-n">${active}</span>
+        </div></td>
+        <td class="r">${fmtN(r.total_orders||0)}</td>
+        <td class="r">${fmt$(r.net_sales||0)}</td>
+        <td class="r">${parseFloat(r.avg_orders_per_customer||0).toFixed(2)}x</td>
+      </tr>`;
+    }).join("")}</tbody>
+  </table>`;
+}
+
+// ── RENDER MONTHLY CHART ──────────────────────────────────────────
+function renderMonthlyChart(rows){
+  const dark=isDark();
+  const DARK_TXT=dark?"#C0BEB7":"#58564F";
+  const GRID=dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)";
+  const labels=rows.map(r=>{
+    const mo=(r.month||"").slice(5,7);
+    const names={
+      "01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun",
+      "07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec"
+    };
+    return names[mo]||mo;
+  });
+  if(moChartInst){moChartInst.destroy();moChartInst=null;}
+  moChartInst=new Chart($("monthlyChart"),{
+    type:"line",
+    data:{
+      labels,
+      datasets:[
+        {label:"Total active",data:rows.map(r=>parseInt(r.total_active_customers||0)),
+         borderColor:"#72AEFF",backgroundColor:"rgba(114,174,255,.1)",
+         pointBackgroundColor:"#72AEFF",pointRadius:3,tension:.35,fill:true},
+        {label:"New",data:rows.map(r=>parseInt(r.new_customers||0)),
+         borderColor:"#2EE896",backgroundColor:"transparent",
+         pointBackgroundColor:"#2EE896",pointRadius:3,tension:.35,borderDash:[4,3]},
+        {label:"Returning",data:rows.map(r=>parseInt(r.returning_customers||0)),
+         borderColor:"#D8B054",backgroundColor:"transparent",
+         pointBackgroundColor:"#D8B054",pointRadius:3,tension:.35,borderDash:[2,2]},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:GRID},ticks:{color:DARK_TXT,font:{size:10},autoSkip:false,maxRotation:0}},
+        y:{grid:{color:GRID},ticks:{color:DARK_TXT,font:{size:10}},
+          title:{display:true,text:"Customers",color:DARK_TXT,font:{size:10}}},
+      }
+    }
+  });
+}
+
+// ── RENDER CHANNELS ───────────────────────────────────────────────
+const CH_COLOR={"Online (Ecom)":"var(--ecom)","Concierge":"var(--conc)","Wellington (POS)":"var(--pos)"};
+function renderChannels(rows){
+  const el=$("ch-grid"); el.innerHTML="";
+  if(!rows.length){el.innerHTML=`<div class="no-data">No channel data. Run pipeline first.</div>`;return;}
+
+  const byChannel={};
+  rows.forEach(r=>{
+    const ch=r.channel||"Other";
+    if(!byChannel[ch]) byChannel[ch]={rows:[],totalCust:0,totalOrd:0,totalRev:0};
+    byChannel[ch].rows.push(r);
+    byChannel[ch].totalCust+=parseInt(r.total_channel_customers||0);
+    byChannel[ch].totalOrd +=parseInt(r.total_channel_orders||0);
+    byChannel[ch].totalRev +=parseFloat(r.net_sales||0);
+  });
+
+  // Deduplicate — use max total_channel_customers per channel
+  Object.keys(byChannel).forEach(ch=>{
+    const d=byChannel[ch];
+    d.totalCust=Math.max(...d.rows.map(r=>parseInt(r.total_channel_customers||0)));
+    d.totalOrd =Math.max(...d.rows.map(r=>parseInt(r.total_channel_orders||0)));
+    d.avgFreq  =parseFloat(d.rows[0]?.avg_freq||0).toFixed(2);
+    d.totalRev =d.rows.reduce((a,r)=>a+parseFloat(r.net_sales||0),0);
+  });
+
+  const BUCKET_LABELS={"1x":"1x","2x":"2x","3x+":"3x+"};
+  Object.entries(byChannel).forEach(([ch,d])=>{
+    const color=CH_COLOR[ch]||"var(--tx3)";
+    const maxPct=Math.max(...d.rows.map(r=>parseFloat(r.pct_of_channel||0)))||1;
+    const div=document.createElement("div"); div.className="chc";
+    div.innerHTML=`
+      <div class="chc-name" style="color:${color}">${ch}</div>
+      <div class="chc-freq" style="color:${color}">${d.avgFreq}x</div>
+      <div class="chc-sub">${fmtN(d.totalCust)} customers · ${fmtN(d.totalOrd)} orders · ${fmt$(d.totalRev)}</div>
+      <div class="chc-buckets">
+        ${d.rows.map(r=>{
+          const lbl=(r.frequency_bucket||"").split(" ")[0];
+          const pct=parseFloat(r.pct_of_channel||0);
+          return `<div class="chc-row">
+            <span class="chc-lbl">${lbl}</span>
+            <div class="chc-bbar"><div class="chc-bfill" style="width:${Math.min(pct,100)}%;background:${color}"></div></div>
+            <span class="chc-pct">${fmtP(pct)}</span>
+          </div>`;
+        }).join("")}
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
+// ── RENDER COHORT ─────────────────────────────────────────────────
+function renderCohort(rows){
+  const el=$("cohort-grid"); el.innerHTML="";
+  if(!rows.length){
+    el.innerHTML=`<div class="no-data" style="grid-column:1/-1">No cohort data. Run pipeline with skip_cohort=false.</div>`;
+    return;
+  }
+  const MMAP={"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun",
+               "07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec"};
+  rows.forEach(r=>{
+    const q=r.cohort||"";
+    const total=parseInt(r.total_customers||0);
+    const r3=parseFloat(r.retention_rate_3m||0);
+    const r6=parseFloat(r.retention_rate_6m||0);
+    const r12=parseFloat(r.retention_rate_12m||0);
+    const colorFor=v=>v>=40?"var(--3x)":v>=20?"var(--2x)":"var(--1x)";
+    const div=document.createElement("div"); div.className="cohort-card";
+    div.innerHTML=`
+      <div class="cohort-name">${q}</div>
+      <div class="cohort-total">${fmtN(total)} customers</div>
+      ${[
+        {label:"Returned within 3 months",val:r3,n:r.returned_3m},
+        {label:"Returned within 6 months",val:r6,n:r.returned_6m},
+        {label:"Returned within 12 months",val:r12,n:r.returned_12m},
+      ].map(({label,val,n})=>`
+        <div class="ret-row">
+          <span class="ret-label">${label}</span>
+          <span class="ret-val" style="color:${colorFor(val)}">${fmtP(val)}</span>
+        </div>
+        <div class="ret-bar-wrap">
+          <div class="ret-bar-fill" style="width:${Math.min(val,100)}%;background:${colorFor(val)}"></div>
+        </div>
+      `).join("")}`;
+    el.appendChild(div);
+  });
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────────
+async function render(){
+  const year = $("sel-year").value;
+  const label = `full_year_${year}`;
+  $("period-info").textContent = `Full Year ${year}`;
+  $("footer-lbl").textContent  = `Full Year ${year}`;
+
+  const [distAll, moAll, segAll, cohAll] = await Promise.all([
+    fetchTab("freq_distribution"),
+    fetchTab("freq_monthly"),
+    fetchTab("freq_segments"),
+    fetchTab("freq_cohort"),
+  ]);
+
+  const dist  = distAll.filter(r=>(r.period||"").includes(year));
+  const mo    = moAll.filter(r=>(r.year||r.period||"").includes(year));
+  const seg   = segAll.filter(r=>(r.period||"").includes(year));
+  const coh   = cohAll.filter(r=>(r.year||r.cohort||"").includes(year));
+
+  if(dist[0]?.updated_at) $("period-info").textContent=`Full Year ${year} · updated ${dist[0].updated_at.slice(0,10)}`;
+
+  renderSummary(dist);
+  renderFreqCards(dist);
+  if(dist.length) renderDistChart(dist);
+  renderMonthlyTable(mo);
+  if(mo.length) renderMonthlyChart(mo);
+  renderChannels(seg);
+  renderCohort(coh);
+}
+
+function forceRefresh(){ cache={}; render(); }
+function toggleTheme(){
+  const h=document.documentElement, dk=h.getAttribute("data-theme")==="dark";
+  h.setAttribute("data-theme",dk?"light":"dark");
+  document.querySelector(".tbtn").textContent=dk?"☀":"☾";
+  cache={}; render();
+}
+
+buildYears();
+render();
+</script>
+</body>
+</html>
