@@ -1,15 +1,12 @@
 name: Frequency Pipeline
 
 on:
-  # Corre cada domingo a las 3PM Bogota (20:00 UTC)
   schedule:
     - cron: '0 20 * * 0'
-
-  # Manual desde GitHub UI
   workflow_dispatch:
     inputs:
       year:
-        description: 'Año a analizar'
+        description: 'Year to analyze'
         required: false
         default: '2025'
         type: choice
@@ -17,7 +14,7 @@ on:
           - '2025'
           - '2026'
       skip_cohort:
-        description: 'Saltar cohorte? (true = rapido 5min | false = completo 20min)'
+        description: 'Skip cohort retention? (true = 5min | false = full 20min)'
         required: false
         default: 'false'
         type: choice
@@ -31,14 +28,11 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Install dependencies
         run: pip install requests gspread google-auth pytz
-
       - name: Run Frequency Pipeline
         env:
           SHOPIFY_STORE:       equestrian-labs.myshopify.com
@@ -48,7 +42,7 @@ jobs:
         run: |
           YEAR="${{ github.event.inputs.year || '2025' }}"
           SKIP="${{ github.event.inputs.skip_cohort || 'false' }}"
-          echo "Running frequency analysis: year=$YEAR skip_cohort=$SKIP"
+          echo "Year=$YEAR  skip_cohort=$SKIP"
           if [ "$SKIP" = "true" ]; then
             python frequency_v1.py --year $YEAR --skip-cohort
           else
