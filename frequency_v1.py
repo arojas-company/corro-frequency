@@ -51,61 +51,94 @@ SCOPES      = [
     "https://www.googleapis.com/auth/drive",
 ]
 
-# ── SHOPIFY REST — con retry automatico en 429 ────────────────────
+# ── SHOPIFY REST — con retry completo en 429 y 5xx ───────────────
 def shopify_get(endpoint, params=None):
     """
-    Paginacion automatica + retry con backoff en rate limit (429).
-    Espera 0.3s entre llamadas para mantenerse bajo el limite de Shopify.
+    Paginacion automatica + retry robusto:
+    - 429: espera Retry-After header
+    - 5xx (502, 503, 504...): espera y reintenta la MISMA pagina
+    - Network errors: espera y reintenta la MISMA pagina
+    El current_url se preserva entre reintentos para no perder paginacion.
     """
     if params is None:
         params = {}
-    url = f"https://{STORE_URL}/admin/api/{API_VERSION}/{endpoint}"
-    headers = {"X-Shopify-Access-Token": TOKEN}
-    results = []
-    while url:
+    start_url      = f"https://{STORE_URL}/admin/api/{API_VERSION}/{endpoint}"
+    headers        = {"X-Shopify-Access-Token": TOKEN}
+    results        = []
+    current_url    = start_url
+    current_params = params
+
+    while current_url:
+        last_error = None
+        response   = None
+
         for attempt in range(8):
             try:
-                r = requests.get(url, headers=headers, params=params, timeout=60)
-            except requests.exceptions.RequestException as e:
-                print(f"    network error attempt {attempt+1}: {e}")
-                time.sleep(5)
-                continue
-            if r.status_code == 429:
-                wait = min(int(r.headers.get("Retry-After", "") or 2 ** attempt), 60)
-                print(f"    rate-limited — waiting {wait}s (attempt {attempt+1})...")
+                response = requests.get(
+                    current_url,
+                    headers=headers,
+                    params=current_params,
+                    timeout=60,
+                )
+            except (requests.exceptions.ConnectionError,
+                    requests.exceptions.Timeout) as e:
+                last_error = e
+                wait = min(10 * (attempt + 1), 60)
+                print(f"    network error (attempt {attempt+1}/8), retry in {wait}s: {e}")
                 time.sleep(wait)
                 continue
-            if r.status_code >= 500:
-                print(f"    server error {r.status_code} — retrying in 10s...")
-                time.sleep(10)
-                continue
-            r.raise_for_status()
-            break
-        else:
-            raise RuntimeError(f"Failed after 8 attempts: {endpoint}")
 
-        data = r.json()
-        # Find the data key (skip 'errors' key if present)
+            if response.status_code == 429:
+                try:
+                    wait = int(response.headers.get("Retry-After", "") or 2)
+                except ValueError:
+                    wait = 2 ** attempt
+                wait = max(wait, 1)
+                print(f"    rate-limited — waiting {wait}s (attempt {attempt+1}/8)...")
+                time.sleep(wait)
+                continue
+
+            if response.status_code >= 500:
+                wait = min(10 * (attempt + 1), 90)
+                print(f"    Shopify {response.status_code} (attempt {attempt+1}/8), retry in {wait}s...")
+                time.sleep(wait)
+                continue
+
+            response.raise_for_status()
+            break
+
+        else:
+            if last_error:
+                raise RuntimeError(
+                    f"shopify_get failed after 8 attempts on {endpoint}: {last_error}"
+                )
+            if response is not None:
+                response.raise_for_status()
+            raise RuntimeError(f"shopify_get failed after 8 attempts on {endpoint}")
+
+        try:
+            data = response.json()
+        except ValueError as e:
+            raise RuntimeError(f"Invalid JSON from Shopify ({endpoint}): {e}")
+
         data_keys = [k for k in data if k != "errors"]
         if not data_keys:
             break
-        key = data_keys[0]
+        key   = data_keys[0]
         batch = data.get(key, [])
         if isinstance(batch, list):
             results.extend(batch)
-        else:
-            results.append(batch)
 
-        # Pagination
-        link = r.headers.get("Link", "")
-        url = None
-        params = {}
+        link           = response.headers.get("Link", "")
+        current_url    = None
+        current_params = {}
         if 'rel="next"' in link:
             for part in link.split(","):
                 if 'rel="next"' in part:
-                    url = part.split(";")[0].strip().strip("<>")
+                    current_url = part.split(";")[0].strip().strip("<>")
 
-        time.sleep(0.35)  # stay safely under Shopify's 2 req/s bucket
+        time.sleep(0.35)
+
     return results
 
 # ── FETCH ORDERS ──────────────────────────────────────────────────
@@ -526,7 +559,18 @@ def upsert_tab(sh, tab_name, headers, new_rows, key_cols):
 
     all_data = [headers]
     for r in merged:
-        clean = ["" if (v is None or (isinstance(v, float) and v != v)) else v for v in r]
+        clean = []
+        for v in r:
+            if v is None:
+                clean.append("")
+            elif isinstance(v, float) and v != v:  # NaN
+                clean.append("")
+            elif hasattr(v, 'strftime'):  # date/datetime -> string
+                clean.append(v.strftime("%Y-%m-%d"))
+            elif isinstance(v, (int, float, bool)):
+                clean.append(v)
+            else:
+                clean.append(str(v))
         all_data.append(clean)
 
     if len(all_data) > ws.row_count or len(headers) > ws.col_count:
@@ -539,7 +583,7 @@ def upsert_tab(sh, tab_name, headers, new_rows, key_cols):
     written = 0
     for i in range(0, len(all_data), BATCH_SIZE):
         batch = all_data[i:i + BATCH_SIZE]
-        sheets_call(ws.append_rows, batch, value_input_option="USER_ENTERED",
+        sheets_call(ws.append_rows, batch, value_input_option="RAW",
                     insert_data_option="INSERT_ROWS")
         written += len(batch)
         if i + BATCH_SIZE < len(all_data):
