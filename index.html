@@ -110,24 +110,13 @@ thead th.r{text-align:right}
 tbody tr{border-bottom:1px solid var(--bd);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--sf2)}
+/* totals row */
+tbody tr.totals-row{border-top:2px solid var(--bd2);background:var(--sf2)}
+tbody tr.totals-row:hover{background:var(--sf3)}
+tbody tr.totals-row td{font-weight:600;color:var(--tx)}
 td{padding:8px 12px;color:var(--tx2);vertical-align:middle}
 td.r{text-align:right;font-family:'DM Mono',monospace;font-size:11px;color:var(--tx)}
 td.mo{color:var(--tx);font-weight:500}
-.act-bar{display:flex;align-items:center;gap:6px;min-width:130px}
-.act-bg{flex:1;height:4px;background:var(--sf3);border-radius:2px;overflow:hidden}
-.act-fill{height:100%;border-radius:2px}
-.act-n{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);min-width:32px;text-align:right}
-
-/* ── COHORT ── */
-.cohort-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
-.cohort-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
-.cohort-name{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:10px}
-.cohort-total{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--tx);margin-bottom:12px}
-.ret-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:11px}
-.ret-label{color:var(--tx3)}
-.ret-val{font-family:'DM Mono',monospace;font-weight:500}
-.ret-bar-wrap{height:3px;background:var(--sf3);border-radius:2px;overflow:hidden;margin-top:3px;margin-bottom:6px}
-.ret-bar-fill{height:100%;border-radius:2px;transition:width .5s}
 
 /* ── CHANNEL COMPARE ── */
 .ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
@@ -141,13 +130,22 @@ td.mo{color:var(--tx);font-weight:500}
 .chc-bbar{flex:1;height:4px;background:var(--sf3);border-radius:2px;overflow:hidden}
 .chc-bfill{height:100%;border-radius:2px}
 .chc-pct{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);min-width:32px;text-align:right}
+/* concierge note */
+.conc-note{background:var(--2x-bg);border:1px solid var(--2x-bd);border-radius:8px;padding:10px 14px;margin-top:10px;font-size:11px;color:var(--tx2);line-height:1.6}
+.conc-note strong{color:var(--2x)}
 
-/* ── LOADING/EMPTY ── */
-.ov{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);
-  z-index:50;align-items:center;justify-content:center;border-radius:10px}
-.ov.show{display:flex}
-.spi{width:22px;height:22px;border:2px solid var(--bd2);border-top-color:var(--3x);border-radius:50%;animation:sp .7s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
+/* ── COHORT ── */
+.cohort-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.cohort-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.cohort-name{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:10px}
+.cohort-total{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--tx);margin-bottom:12px}
+.ret-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;font-size:11px}
+.ret-label{color:var(--tx3)}
+.ret-val{font-family:'DM Mono',monospace;font-weight:500}
+.ret-bar-wrap{height:3px;background:var(--sf3);border-radius:2px;overflow:hidden;margin-top:2px;margin-bottom:8px}
+.ret-bar-fill{height:100%;border-radius:2px;transition:width .5s}
+
+/* ── EMPTY ── */
 .empty{padding:28px;text-align:center;font-size:12px;color:var(--tx3)}
 .no-data{font-size:11px;color:var(--tx3);text-align:center;padding:20px}
 
@@ -165,7 +163,7 @@ td.mo{color:var(--tx);font-weight:500}
     <div>
       <div class="brand-row">
         <div class="brand-dot"></div>
-        <div><div class="brand-name">Equestrian Labs — Corro</div><div class="brand-sub">Purchase Frequency · Shopify API → Google Sheets</div></div>
+        <div><div class="brand-name">Equestrian Labs — Corro</div><div class="brand-sub">Purchase Frequency · Shopify API → Google Sheets · Customer Tag based</div></div>
       </div>
       <h1>Purchase <span>Frequency</span></h1>
       <div class="period-info" id="period-info">Select a year above</div>
@@ -187,7 +185,7 @@ td.mo{color:var(--tx);font-weight:500}
   <!-- KPI SUMMARY -->
   <div class="cards">
     <div class="card"><div class="card-accent" style="background:var(--3x)"></div><div class="card-l">Total Customers</div><div class="card-v" id="s-total">—</div><div class="card-s">unique buyers this year</div></div>
-    <div class="card"><div class="card-accent" style="background:var(--2x)"></div><div class="card-l">Avg Orders / Customer</div><div class="card-v" id="s-avg">—</div><div class="card-s">Ceci target: ~2.8</div></div>
+    <div class="card"><div class="card-accent" style="background:var(--2x)"></div><div class="card-l">Avg Orders / Customer</div><div class="card-v" id="s-avg">—</div><div class="card-s">Ceci target: ~2.8x</div></div>
     <div class="card"><div class="card-accent" style="background:var(--1x)"></div><div class="card-l">One-time Buyers</div><div class="card-v" id="s-1x">—</div><div class="card-s">bought only once</div></div>
     <div class="card"><div class="card-accent" style="background:var(--3x)"></div><div class="card-l">Loyal Buyers (3x+)</div><div class="card-v" id="s-3x">—</div><div class="card-s">3 or more orders</div></div>
     <div class="card"><div class="card-accent" style="background:var(--tx3)"></div><div class="card-l">Total Revenue</div><div class="card-v" id="s-rev">—</div></div>
@@ -202,50 +200,46 @@ td.mo{color:var(--tx);font-weight:500}
     <div class="freq-card freq-card-3x"><div class="freq-label freq-label-3x">3x+ — loyal buyers</div><div class="freq-num freq-num-3x" id="f3-n">—</div><div class="freq-sub" id="f3-pct">of all customers</div><div class="freq-bar-wrap"><div class="freq-bar-fill" id="f3-bar" style="background:var(--3x)"></div></div><div class="freq-rev">Revenue: <span id="f3-rev">—</span> <span id="f3-rpct" style="color:var(--tx3)"></span></div></div>
   </div>
 
-  <!-- BAR CHART: Distribution visual -->
+  <!-- LINE CHART ONLY — bar chart removed per Ceci's request -->
+  <div class="sec"><div class="sn">02</div><div class="sl"></div><div class="st">Monthly customer activity trend</div></div>
   <div class="chart-box" style="margin-bottom:8px">
     <div class="chart-header">
-      <div class="chart-title">Customers vs Revenue by frequency bucket</div>
-      <div class="chart-note" id="chart-note">—</div>
+      <div class="chart-title">Monthly Customer Activity Trend</div>
+      <div class="chart-note" id="chart-note">New vs Returning buyers per month</div>
     </div>
-    <div class="chart-legend" id="dist-legend"></div>
-    <div style="position:relative;height:200px"><canvas id="distChart" role="img" aria-label="Bar chart comparing customer count and revenue share by frequency bucket">Frequency distribution chart</canvas></div>
+    <div class="chart-legend">
+      <span class="leg-item"><span class="leg-dot" style="background:#72AEFF"></span>Total active</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#2EE896"></span>New customers</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#D8B054"></span>Returning customers</span>
+    </div>
+    <div style="position:relative;height:240px"><canvas id="monthlyChart" role="img" aria-label="Line chart of monthly active customers">Monthly customer trend</canvas></div>
   </div>
 
-  <!-- SECTION 2: MONTHLY ACTIVE -->
-  <div class="sec"><div class="sn">02</div><div class="sl"></div><div class="st">Monthly active customers — must match ~400-600 seen in Shopify</div></div>
+  <!-- SECTION 3: MONTHLY TABLE -->
+  <div class="sec"><div class="sn">03</div><div class="sl"></div><div class="st">Active customers per month — must match ~400-600 seen in Shopify</div></div>
   <div class="tbl-wrap">
     <div class="tbl-head">
       <div class="tbl-title">Active customers per month</div>
+      <!-- CHANGED: clarified definition of New and Returning -->
       <div class="tbl-note">New = first purchase this year · Returning = already bought before</div>
     </div>
     <div id="monthly-table"><div class="empty">Select a year above</div></div>
   </div>
 
-  <!-- LINE CHART: Monthly trend -->
-  <div class="chart-box" style="margin-top:8px">
-    <div class="chart-header">
-      <div class="chart-title">Monthly customer activity trend</div>
-      <div class="chart-note">New vs Returning buyers per month</div>
-    </div>
-    <div class="chart-legend" id="monthly-legend">
-      <span class="leg-item"><span class="leg-dot" style="background:#72AEFF"></span>Total active</span>
-      <span class="leg-item"><span class="leg-dot" style="background:#2EE896"></span>New customers</span>
-      <span class="leg-item"><span class="leg-dot" style="background:#D8B054"></span>Returning customers</span>
-    </div>
-    <div style="position:relative;height:220px"><canvas id="monthlyChart" role="img" aria-label="Line chart of monthly active customers">Monthly customer trend</canvas></div>
+  <!-- SECTION 4: BY CHANNEL — Concierge by Customer Tag -->
+  <div class="sec"><div class="sn">04</div><div class="sl"></div><div class="st">By sales channel — Concierge filtered by Customer Tag</div></div>
+  <!-- CHANGED: added note that Concierge is by Customer Tag, not order tag -->
+  <div class="conc-note" id="conc-tag-note" style="margin-bottom:10px">
+    <strong>⚠ Concierge segment</strong> — filtered by <strong>Customer Tag</strong> (not order tag). Customers tagged <code>Concierge</code> in Shopify Admin are grouped here regardless of order source. If a Concierge customer shows 1x purchase, verify their tag is set at customer level.
   </div>
-
-  <!-- SECTION 3: BY CHANNEL -->
-  <div class="sec"><div class="sn">03</div><div class="sl"></div><div class="st">By sales channel — Ecom vs Concierge loyalty comparison</div></div>
   <div class="ch-grid" id="ch-grid"><div class="no-data">Select a year above</div></div>
 
-  <!-- SECTION 4: COHORT RETENTION -->
-  <div class="sec"><div class="sn">04</div><div class="sl"></div><div class="st">Cohort retention — of Q1 buyers, how many came back?</div></div>
+  <!-- SECTION 5: COHORT RETENTION -->
+  <div class="sec"><div class="sn">05</div><div class="sl"></div><div class="st">Cohort retention — of Q1 buyers, how many came back?</div></div>
   <div class="cohort-grid" id="cohort-grid"><div class="no-data">Select a year above (requires --skip-cohort=false when running pipeline)</div></div>
 
   <div style="margin-top:24px;font-size:10px;color:var(--tx3);text-align:center">
-    Google Sheets ← frequency_v1.py ← Shopify API &nbsp;·&nbsp; <span id="footer-lbl">—</span>
+    Google Sheets ← frequency_v1.py ← Shopify API &nbsp;·&nbsp; Concierge = Customer Tag &nbsp;·&nbsp; <span id="footer-lbl">—</span>
   </div>
 </div>
 
@@ -256,7 +250,7 @@ const AKEY    = "AIzaSyBEtmFj94CYPEjt0_aaM_qMHW3SVJ7YyJU";
 const START_Y = 2024;
 const CY      = new Date().getFullYear();
 let cache     = {};
-let distChartInst = null, moChartInst = null;
+let moChartInst = null;
 const $ = id => document.getElementById(id);
 
 function fmt$(v){
@@ -291,13 +285,6 @@ async function fetchTab(tab){
     return res;
   }catch(e){console.error(tab,e);return[];}
 }
-
-function filterYear(rows,year,yearCol="year"){
-  const yStr=String(year);
-  return rows.filter(r=>(r[yearCol]||r.period||"").includes(yStr));
-}
-
-function isDark(){return document.documentElement.getAttribute("data-theme")==="dark"}
 
 // ── RENDER KPI SUMMARY ────────────────────────────────────────────
 function renderSummary(distRows){
@@ -340,105 +327,16 @@ function renderFreqCards(distRows){
   });
 }
 
-// ── RENDER DIST CHART ─────────────────────────────────────────────
-function renderDistChart(distRows){
-  const dark=isDark();
-  const labels=distRows.map(r=>r.frequency_bucket?.replace(" — "," ") || "");
-  const custData=distRows.map(r=>parseInt(r.customers||0));
-  const revPct=distRows.map(r=>parseFloat(r.pct_revenue||0));
-  const COLORS=["#72AEFF","#D8B054","#2EE896"];
-  const DARK_TXT=dark?"#C0BEB7":"#58564F";
-  const GRID=dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)";
-
-  if(distChartInst){distChartInst.destroy();distChartInst=null;}
-  distChartInst=new Chart($("distChart"),{
-    type:"bar",
-    data:{
-      labels,
-      datasets:[
-        {label:"Customers",data:custData,backgroundColor:COLORS,borderRadius:4,yAxisID:"y"},
-        {label:"Revenue %",data:revPct,type:"line",borderColor:"#F06868",backgroundColor:"rgba(240,104,104,.15)",
-         pointBackgroundColor:"#F06868",pointRadius:4,yAxisID:"y2",tension:.3},
-      ]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{
-        label:ctx=>ctx.datasetIndex===0?`${ctx.parsed.y.toLocaleString()} customers`:`${ctx.parsed.y.toFixed(1)}% of revenue`
-      }}},
-      scales:{
-        x:{grid:{color:GRID},ticks:{color:DARK_TXT,font:{size:11}}},
-        y:{grid:{color:GRID},ticks:{color:DARK_TXT,font:{size:10}},title:{display:true,text:"Customers",color:DARK_TXT,font:{size:10}}},
-        y2:{position:"right",grid:{display:false},ticks:{color:"#F06868",font:{size:10},callback:v=>v+"%"},
-          title:{display:true,text:"Revenue %",color:"#F06868",font:{size:10}}},
-      }
-    }
-  });
-  $("dist-legend").innerHTML=`
-    <span class="leg-item"><span class="leg-dot" style="background:#72AEFF"></span>Customer count</span>
-    <span class="leg-item"><span class="leg-dot" style="background:#D8B054"></span>Customers (2x)</span>
-    <span class="leg-item"><span class="leg-dot" style="background:#2EE896"></span>Customers (3x+)</span>
-    <span class="leg-item"><span class="leg-dot" style="background:#F06868;border-radius:50%"></span>Revenue % (line)</span>`;
-  $("chart-note").textContent=`${distRows.reduce((a,r)=>a+parseInt(r.customers||0),0).toLocaleString()} total customers`;
-}
-
-// ── RENDER MONTHLY TABLE ──────────────────────────────────────────
-function renderMonthlyTable(rows){
-  const el=$("monthly-table");
-  if(!rows.length){el.innerHTML=`<div class="empty">No monthly data. Run pipeline first.</div>`;return;}
-  const maxActive=Math.max(...rows.map(r=>parseInt(r.total_active_customers||0)))||1;
-  const MNAMES={
-    "01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun",
-    "07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec"
-  };
-  el.innerHTML=`<table>
-    <thead><tr>
-      <th>Month</th>
-      <th class="r">Active</th>
-      <th class="r">New</th>
-      <th class="r">Returning</th>
-      <th>Active customers bar</th>
-      <th class="r">Orders</th>
-      <th class="r">Revenue</th>
-      <th class="r">Avg Orders</th>
-    </tr></thead>
-    <tbody>${rows.map(r=>{
-      const mo=(r.month||"").slice(5,7);
-      const moLabel=(MNAMES[mo]||mo)+" "+(r.month||"").slice(0,4);
-      const active=parseInt(r.total_active_customers||0);
-      const newC=parseInt(r.new_customers||0);
-      const retC=parseInt(r.returning_customers||0);
-      const pct=Math.round(active/maxActive*100);
-      const warn=active<200?"color:var(--tx3);font-style:italic":"";
-      return `<tr>
-        <td class="mo">${moLabel}</td>
-        <td class="r" style="${warn}">${fmtN(active)}</td>
-        <td class="r" style="color:var(--3x)">${fmtN(newC)}</td>
-        <td class="r" style="color:var(--2x)">${fmtN(retC)}</td>
-        <td><div class="act-bar">
-          <div class="act-bg"><div class="act-fill" style="width:${pct}%;background:${active>=400?"var(--3x)":"var(--2x)"}"></div></div>
-          <span class="act-n">${active}</span>
-        </div></td>
-        <td class="r">${fmtN(r.total_orders||0)}</td>
-        <td class="r">${fmt$(r.net_sales||0)}</td>
-        <td class="r">${parseFloat(r.avg_orders_per_customer||0).toFixed(2)}x</td>
-      </tr>`;
-    }).join("")}</tbody>
-  </table>`;
-}
-
-// ── RENDER MONTHLY CHART ──────────────────────────────────────────
+// ── RENDER MONTHLY CHART (line only, no bar) ──────────────────────
 function renderMonthlyChart(rows){
-  const dark=isDark();
+  const dark = document.documentElement.getAttribute("data-theme")==="dark";
   const DARK_TXT=dark?"#C0BEB7":"#58564F";
   const GRID=dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)";
+  const MNAMES={"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun",
+    "07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec"};
   const labels=rows.map(r=>{
     const mo=(r.month||"").slice(5,7);
-    const names={
-      "01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun",
-      "07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec"
-    };
-    return names[mo]||mo;
+    return (MNAMES[mo]||mo)+" '"+(r.month||"").slice(2,4);
   });
   if(moChartInst){moChartInst.destroy();moChartInst=null;}
   moChartInst=new Chart($("monthlyChart"),{
@@ -446,20 +344,44 @@ function renderMonthlyChart(rows){
     data:{
       labels,
       datasets:[
-        {label:"Total active",data:rows.map(r=>parseInt(r.total_active_customers||0)),
-         borderColor:"#72AEFF",backgroundColor:"rgba(114,174,255,.1)",
-         pointBackgroundColor:"#72AEFF",pointRadius:3,tension:.35,fill:true},
-        {label:"New",data:rows.map(r=>parseInt(r.new_customers||0)),
+        {label:"Total active",
+         data:rows.map(r=>parseInt(r.total_active_customers||0)),
+         borderColor:"#72AEFF",backgroundColor:"rgba(114,174,255,.08)",
+         pointBackgroundColor:"#72AEFF",pointRadius:4,pointHoverRadius:6,
+         tension:.35,fill:true,borderWidth:2},
+        {label:"New",
+         data:rows.map(r=>parseInt(r.new_customers||0)),
          borderColor:"#2EE896",backgroundColor:"transparent",
-         pointBackgroundColor:"#2EE896",pointRadius:3,tension:.35,borderDash:[4,3]},
-        {label:"Returning",data:rows.map(r=>parseInt(r.returning_customers||0)),
+         pointBackgroundColor:"#2EE896",pointRadius:3,pointHoverRadius:5,
+         tension:.35,borderDash:[5,3],borderWidth:1.5},
+        {label:"Returning",
+         data:rows.map(r=>parseInt(r.returning_customers||0)),
          borderColor:"#D8B054",backgroundColor:"transparent",
-         pointBackgroundColor:"#D8B054",pointRadius:3,tension:.35,borderDash:[2,2]},
+         pointBackgroundColor:"#D8B054",pointRadius:3,pointHoverRadius:5,
+         tension:.35,borderDash:[2,2],borderWidth:1.5},
       ]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label:ctx=>{
+              const v=ctx.parsed.y;
+              const ds=ctx.dataset.label;
+              // CHANGED: show % of total in tooltip for New and Returning
+              if(ds==="New"||ds==="Returning"){
+                const totalRow=rows[ctx.dataIndex];
+                const total=parseInt(totalRow?.total_active_customers||0);
+                const pct=total>0?((v/total)*100).toFixed(1):0;
+                return `${ds}: ${v.toLocaleString()} (${pct}% of active)`;
+              }
+              return `${ds}: ${v.toLocaleString()}`;
+            }
+          }
+        }
+      },
       scales:{
         x:{grid:{color:GRID},ticks:{color:DARK_TXT,font:{size:10},autoSkip:false,maxRotation:0}},
         y:{grid:{color:GRID},ticks:{color:DARK_TXT,font:{size:10}},
@@ -469,7 +391,81 @@ function renderMonthlyChart(rows){
   });
 }
 
-// ── RENDER CHANNELS ───────────────────────────────────────────────
+// ── RENDER MONTHLY TABLE ──────────────────────────────────────────
+// CHANGES:
+//  1. Added "% New" column (New / Active × 100)
+//  2. Added "Total Orders" label (was just "Orders")
+//  3. Added totals row at the bottom (after December)
+//  4. Removed the Active Customers Bar column
+function renderMonthlyTable(rows){
+  const el=$("monthly-table");
+  if(!rows.length){el.innerHTML=`<div class="empty">No monthly data. Run pipeline first.</div>`;return;}
+
+  const MNAMES={
+    "01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun",
+    "07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec"
+  };
+
+  // Compute totals for the footer row
+  let totActive=0, totNew=0, totRet=0, totOrders=0, totRev=0;
+  rows.forEach(r=>{
+    totActive  += parseInt(r.total_active_customers||0);
+    totNew     += parseInt(r.new_customers||0);
+    totRet     += parseInt(r.returning_customers||0);
+    totOrders  += parseInt(r.total_orders||0);
+    totRev     += parseFloat(r.net_sales||0);
+  });
+  const totAvgOrd = totActive > 0 ? (totOrders/totActive).toFixed(2) : "—";
+  const totNewPct = totActive > 0 ? ((totNew/totActive)*100).toFixed(1)+"%" : "—";
+
+  el.innerHTML=`<table>
+    <thead><tr>
+      <th>Month</th>
+      <th class="r">Active</th>
+      <th class="r">New</th>
+      <th class="r">% New</th>
+      <th class="r">Returning</th>
+      <th class="r">Total Orders</th>
+      <th class="r">Revenue</th>
+      <th class="r">Avg Orders</th>
+    </tr></thead>
+    <tbody>
+      ${rows.map(r=>{
+        const mo=(r.month||"").slice(5,7);
+        const moLabel=(MNAMES[mo]||mo)+" "+(r.month||"").slice(0,4);
+        const active=parseInt(r.total_active_customers||0);
+        const newC  =parseInt(r.new_customers||0);
+        const retC  =parseInt(r.returning_customers||0);
+        const orders=parseInt(r.total_orders||0);
+        // CHANGED: compute % New inline
+        const pctNew = active > 0 ? ((newC/active)*100).toFixed(1)+"%" : "—";
+        return `<tr>
+          <td class="mo">${moLabel}</td>
+          <td class="r">${fmtN(active)}</td>
+          <td class="r" style="color:var(--3x)">${fmtN(newC)}</td>
+          <td class="r" style="color:var(--3x);font-weight:600">${pctNew}</td>
+          <td class="r" style="color:var(--2x)">${fmtN(retC)}</td>
+          <td class="r">${fmtN(orders)}</td>
+          <td class="r">${fmt$(r.net_sales||0)}</td>
+          <td class="r">${parseFloat(r.avg_orders_per_customer||0).toFixed(2)}x</td>
+        </tr>`;
+      }).join("")}
+      <!-- CHANGED: totals row added after last month -->
+      <tr class="totals-row">
+        <td class="mo">Total / Avg</td>
+        <td class="r">${fmtN(totActive)}</td>
+        <td class="r" style="color:var(--3x)">${fmtN(totNew)}</td>
+        <td class="r" style="color:var(--3x)">${totNewPct}</td>
+        <td class="r" style="color:var(--2x)">${fmtN(totRet)}</td>
+        <td class="r">${fmtN(totOrders)}</td>
+        <td class="r">${fmt$(totRev)}</td>
+        <td class="r">${totAvgOrd}x</td>
+      </tr>
+    </tbody>
+  </table>`;
+}
+
+// ── RENDER CHANNELS (Concierge by Customer Tag) ───────────────────
 const CH_COLOR={"Online (Ecom)":"var(--ecom)","Concierge":"var(--conc)","Wellington (POS)":"var(--pos)"};
 function renderChannels(rows){
   const el=$("ch-grid"); el.innerHTML="";
@@ -485,7 +481,6 @@ function renderChannels(rows){
     byChannel[ch].totalRev +=parseFloat(r.net_sales||0);
   });
 
-  // Deduplicate — use max total_channel_customers per channel
   Object.keys(byChannel).forEach(ch=>{
     const d=byChannel[ch];
     d.totalCust=Math.max(...d.rows.map(r=>parseInt(r.total_channel_customers||0)));
@@ -494,13 +489,22 @@ function renderChannels(rows){
     d.totalRev =d.rows.reduce((a,r)=>a+parseFloat(r.net_sales||0),0);
   });
 
-  const BUCKET_LABELS={"1x":"1x","2x":"2x","3x+":"3x+"};
   Object.entries(byChannel).forEach(([ch,d])=>{
     const color=CH_COLOR[ch]||"var(--tx3)";
-    const maxPct=Math.max(...d.rows.map(r=>parseFloat(r.pct_of_channel||0)))||1;
     const div=document.createElement("div"); div.className="chc";
+
+    // CHANGED: for Concierge, add note about 1x purchases and Customer Tag
+    const isConcierge = ch==="Concierge";
+    const oneXRow = d.rows.find(r=>(r.frequency_bucket||"").startsWith("1x"));
+    const oneXPct = oneXRow ? parseFloat(oneXRow.pct_of_channel||0) : 0;
+    const conciergeWarning = (isConcierge && oneXPct > 30)
+      ? `<div style="margin-top:8px;padding:6px 8px;background:var(--2x-bg);border:1px solid var(--2x-bd);border-radius:5px;font-size:10px;color:var(--2x)">
+          ⚠ ${oneXPct.toFixed(0)}% made only 1 purchase — verify Customer Tag at customer level
+         </div>`
+      : "";
+
     div.innerHTML=`
-      <div class="chc-name" style="color:${color}">${ch}</div>
+      <div class="chc-name" style="color:${color}">${ch}${isConcierge?' <span style="font-size:9px;opacity:.6">(by Customer Tag)</span>':''}</div>
       <div class="chc-freq" style="color:${color}">${d.avgFreq}x</div>
       <div class="chc-sub">${fmtN(d.totalCust)} customers · ${fmtN(d.totalOrd)} orders · ${fmt$(d.totalRev)}</div>
       <div class="chc-buckets">
@@ -513,7 +517,8 @@ function renderChannels(rows){
             <span class="chc-pct">${fmtP(pct)}</span>
           </div>`;
         }).join("")}
-      </div>`;
+      </div>
+      ${conciergeWarning}`;
     el.appendChild(div);
   });
 }
@@ -525,8 +530,6 @@ function renderCohort(rows){
     el.innerHTML=`<div class="no-data" style="grid-column:1/-1">No cohort data. Run pipeline with skip_cohort=false.</div>`;
     return;
   }
-  const MMAP={"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun",
-               "07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec"};
   rows.forEach(r=>{
     const q=r.cohort||"";
     const total=parseInt(r.total_customers||0);
@@ -558,7 +561,6 @@ function renderCohort(rows){
 // ── MAIN RENDER ───────────────────────────────────────────────────
 async function render(){
   const year = $("sel-year").value;
-  const label = `full_year_${year}`;
   $("period-info").textContent = `Full Year ${year}`;
   $("footer-lbl").textContent  = `Full Year ${year}`;
 
@@ -574,11 +576,11 @@ async function render(){
   const seg   = segAll.filter(r=>(r.period||"").includes(year));
   const coh   = cohAll.filter(r=>(r.year||r.cohort||"").includes(year));
 
-  if(dist[0]?.updated_at) $("period-info").textContent=`Full Year ${year} · updated ${dist[0].updated_at.slice(0,10)}`;
+  if(dist[0]?.updated_at)
+    $("period-info").textContent=`Full Year ${year} · updated ${dist[0].updated_at.slice(0,10)}`;
 
   renderSummary(dist);
   renderFreqCards(dist);
-  if(dist.length) renderDistChart(dist);
   renderMonthlyTable(mo);
   if(mo.length) renderMonthlyChart(mo);
   renderChannels(seg);
