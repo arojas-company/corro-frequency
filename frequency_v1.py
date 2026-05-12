@@ -1,1284 +1,699 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Equestrian Labs — Analytics</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-[data-theme="light"]{
-  --bg:#EDF2F7;--sf:#FFFFFF;--sf2:#F0F5FA;--sf3:#E2EAF2;
-  --bd:#C8D8E8;--bd2:#A0B8D0;
-  --tx:#0D1B2A;--tx2:#3A5470;--tx3:#7A96B0;
-  --gr:#0C7050;--gr-bg:#D2F0E4;--gr-bd:rgba(12,112,80,.2);
-  --rd:#B83020;--rd-bg:#FAE0DC;--rd-bd:rgba(184,48,32,.2);
-  --gd:#8B6914;--pu:#4840B0;--bl:#1450A8;
-  --am:#c47a00;--am-bg:rgba(196,122,0,.09);--am-bd:rgba(196,122,0,.25);
-  --navy:#1C3F6E;--navy2:#0D2B4E;
-}
-[data-theme="dark"]{
-  --bg:#0D1B2A;--sf:#0F2236;--sf2:#162E48;--sf3:#1C3A58;
-  --bd:#1E3A5F;--bd2:#2A5080;
-  --tx:#F0F6FF;--tx2:#A8C0D8;--tx3:#5A7A98;
-  --gr:#2EE896;--gr-bg:#0A3020;--gr-bd:rgba(46,232,150,.22);
-  --rd:#F06868;--rd-bg:#3C1010;--rd-bd:rgba(240,104,104,.22);
-  --gd:#D8B054;--pu:#A090FF;--bl:#72AEFF;
-  --am:#D8B054;--am-bg:rgba(216,176,84,.10);--am-bd:rgba(216,176,84,.25);
-  --navy:#1C3F6E;--navy2:#0D2B4E;
-}
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx)}
-.app{display:flex;min-height:100vh}
-.sb{width:200px;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex-shrink:0;overflow:hidden}
-.sb-top{padding:16px 14px 13px;border-bottom:1px solid var(--bd)}
-.sb-dots{display:flex;gap:3px;margin-bottom:6px}
-.sb-dot{width:7px;height:7px;border-radius:50%}
-.sb-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--tx)}
-.sb-sub{font-size:10px;color:var(--tx3);margin-top:1px}
-.sb-nav{flex:1;padding:7px 0;overflow-y:auto}
-.sb-sec{padding:8px 14px 3px;font-size:9px;font-weight:600;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase}
-.sb-item{display:flex;align-items:center;gap:7px;padding:6px 14px;font-size:12px;color:var(--tx2);cursor:pointer;border-left:2px solid transparent;text-decoration:none;transition:all .1s}
-.sb-item:hover,.sb-item.on{background:var(--sf2);color:var(--tx)}
-.sb-item.on{border-left-color:var(--gr);font-weight:500}
-.sb-suite{display:flex;align-items:center;gap:7px;padding:5px 14px;font-size:11px;color:var(--tx3);text-decoration:none;border-left:2px solid transparent;transition:all .1s}
-.sb-suite:hover{background:var(--sf2);color:var(--tx)}
-.sb-badge{display:inline-flex;align-items:center;padding:1px 5px;border-radius:20px;font-size:9px;font-weight:600;margin-left:auto}
-.sb-foot{padding:10px 14px;border-top:1px solid var(--bd)}
-.sync-r{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--tx3)}
-.sync-d{width:5px;height:5px;border-radius:50%;background:var(--gr);animation:pu 2.5s infinite}
-@keyframes pu{0%,100%{opacity:1}50%{opacity:.15}}
-.main{flex:1;padding:20px 22px;min-width:0;overflow-x:hidden}
-.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
-.ph h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--tx);letter-spacing:-.025em}
-.ph p{font-size:11px;color:var(--tx3);margin-top:2px}
-.ph-r{display:flex;align-items:center;gap:6px}
-.live-dot{display:flex;align-items:center;gap:4px;background:var(--gr-bg);border:1px solid var(--gr-bd);border-radius:20px;padding:3px 9px;font-size:10px;color:var(--gr);font-weight:600}
-.icon-btn{width:27px;height:27px;border-radius:50%;border:1px solid var(--bd2);background:var(--sf2);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .12s}
-.icon-btn:hover{border-color:var(--gr);color:var(--gr)}
-.rf-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:5px;border:1px solid var(--bd2);background:var(--sf2);color:var(--tx2);cursor:pointer;font-size:10px;font-weight:500;font-family:'DM Sans',sans-serif;transition:all .12s}
-.rf-btn:hover{border-color:var(--gr);color:var(--gr)}
-.ctrl{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.btn-grp{display:flex;gap:2px;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:2px}
-.brand-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:5px;border:1px solid transparent;background:transparent;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--tx2);cursor:pointer;transition:all .12s}
-.brand-btn.on{background:var(--sf);color:var(--tx);border-color:var(--bd2)}
-.period-btn{padding:4px 10px;border-radius:5px;border:1px solid transparent;background:transparent;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--tx2);cursor:pointer;transition:all .12s}
-.period-btn.on{background:var(--sf);color:var(--tx);border-color:var(--bd2)}
-.selbar{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:9px 13px;margin-bottom:11px;display:flex;align-items:center;flex-wrap:wrap;gap:12px}
-.sel-grp{display:flex;align-items:center;gap:7px}
-.sel-lbl{font-size:10px;color:var(--tx3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
-.sel-div{width:1px;height:16px;background:var(--bd2)}
-select{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--tx);background:var(--sf2);border:1px solid var(--bd2);border-radius:5px;padding:4px 10px;cursor:pointer;outline:none;transition:border-color .12s}
-select:focus{border-color:var(--gr)}
-.ibar{font-size:11px;color:var(--tx3);background:var(--sf2);border-radius:6px;padding:6px 12px;margin-bottom:13px;line-height:1.7}
-.ibar span{color:var(--tx);font-weight:500}
-.warn-bar{display:none;font-size:10px;color:var(--am);background:var(--am-bg);border:1px solid var(--am-bd);border-radius:6px;padding:5px 11px;margin-bottom:10px;line-height:1.6}
-.warn-bar.show{display:block}
-.sec{display:flex;align-items:center;gap:8px;margin:16px 0 9px}
-.sec-num{font-size:9px;font-weight:700;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;font-family:'Syne',sans-serif;white-space:nowrap}
-.sec-line{flex:1;height:1px;background:var(--bd)}
-.sec-lbl{font-size:9px;font-weight:600;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
-.kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:7px}
-.kc{background:var(--sf);border:1px solid var(--bd);border-radius:9px;padding:13px 14px;position:relative;overflow:hidden;transition:border-color .12s,transform .1s}
-.kc:hover{border-color:var(--bd2);transform:translateY(-1px)}
-.kc-bar{position:absolute;top:0;left:0;right:0;height:3px}
-.kc-lbl{font-size:10px;color:var(--tx2);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
-.kc-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:var(--tx);letter-spacing:-.04em;line-height:1;margin-bottom:9px}
-.kc-badges{display:flex;gap:4px;flex-wrap:wrap}
-.kc-note{font-size:9px;color:var(--tx3);margin-top:4px;font-style:italic}
-.bdg{display:inline-flex;align-items:center;gap:2px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px}
-.bdg-lbl{font-size:9px;opacity:.55;margin-right:1px;font-weight:400}
-.bdg-up{background:var(--gr-bg);color:var(--gr);border:1px solid var(--gr-bd)}
-.bdg-dn{background:var(--rd-bg);color:var(--rd);border:1px solid var(--rd-bd)}
-.bdg-neu{background:var(--sf2);color:var(--tx3);border:1px solid var(--bd)}
-.bdg-am{background:var(--am-bg);color:var(--am);border:1px solid var(--am-bd)}
-.kc-fcs{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);border:1px solid var(--bd2);border-radius:9px;padding:13px 14px;position:relative;overflow:hidden;transition:transform .1s}
-.kc-fcs:hover{transform:translateY(-1px)}
-.kc-fcs .kc-lbl{color:#A8C8E8}
-.kc-fcs .kc-val{color:#FFFFFF;font-family:'Syne',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.04em;line-height:1;margin-bottom:9px}
-.kc-fcs .kc-note{color:#7AA8C8}
-.kc-sub{background:var(--sf);border:1px solid rgba(160,144,255,.3);border-radius:9px;padding:13px 14px;position:relative;overflow:hidden;transition:border-color .12s,transform .1s}
-.kc-sub:hover{border-color:rgba(160,144,255,.6);transform:translateY(-1px)}
-.kc-sub .kc-bar{background:var(--pu)}
-.kc-sub .kc-lbl{color:var(--pu)}
-.kc-sub .kc-val{font-family:'Syne',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.04em;line-height:1;margin-bottom:9px}
-.panel{background:var(--sf);border:1px solid var(--bd);border-radius:9px;overflow:hidden;margin-top:7px}
-.panel-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;user-select:none;transition:background .1s}
-.panel-hd:hover{background:var(--sf2)}
-.panel.open .panel-hd{background:var(--sf2);border-bottom:1px solid var(--bd)}
-.panel-title{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--tx2);letter-spacing:.07em;text-transform:uppercase}
-.panel-dot{width:5px;height:5px;border-radius:50%}
-.panel-chev{font-size:10px;color:var(--tx3);transition:transform .18s}
-.panel.open .panel-chev{transform:rotate(180deg)}
-.panel-body{display:none;padding:12px 14px}
-.panel.open .panel-body{display:block}
-.rs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:7px}
-.rs-card{background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:11px 12px}
-.rs-name{font-size:10px;color:var(--tx3);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
-.rs-pct{font-family:'Syne',sans-serif;font-size:20px;font-weight:700}
-.rs-amt{font-size:11px;color:var(--tx2);margin-top:2px}
-.rs-gp{font-size:10px;color:var(--tx3);margin-top:5px;padding-top:5px;border-top:1px solid var(--bd)}
-.rs-gp span{font-weight:600}
-.rs-bar-wrap{height:2px;background:var(--bd2);border-radius:1px;margin-top:8px;overflow:hidden}
-.rs-bar-fill{height:100%;border-radius:1px}
-.nvr-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.nvr-col{background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:12px 13px}
-.nvr-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.nvr-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.nvr-lbl{font-size:10px;color:var(--tx3)}
-.nvr-val{font-size:12px;font-weight:600;color:var(--tx);font-family:'Syne',sans-serif}
-.nvr-gp{color:var(--gr) !important}
-.nvr-note{font-size:9px;color:var(--am);margin-top:6px;font-style:italic}
-.cac-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:7px}
-.cac-note-box{font-size:9px;color:var(--am);background:var(--am-bg);border:1px solid var(--am-bd);border-radius:5px;padding:5px 9px;margin-bottom:10px;line-height:1.6}
-.mi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:10px;margin-bottom:12px}
-.mi-field{display:flex;flex-direction:column;gap:4px}
-.mi-lbl{font-size:9px;color:var(--tx3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-.mi-note{font-size:9px;color:var(--am);font-style:italic;display:block;margin-top:1px}
-.mi-wrap{position:relative}
-.mi-pre{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--tx3);pointer-events:none}
-.mi-inp{width:100%;background:var(--sf2);border:1px solid var(--bd2);border-radius:6px;padding:7px 9px 7px 22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--tx);outline:none;transition:border-color .12s}
-.mi-inp.no-pre{padding-left:9px}
-.mi-inp:focus{border-color:var(--gr)}
-.mi-sub-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:4px}
-.mi-sub-lbl{font-size:9px;color:var(--tx3);margin-bottom:2px}
-.mi-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--bd)}
-.btn-save{padding:6px 14px;border-radius:6px;border:none;background:var(--gr);color:#0A0A09;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:opacity .12s}
-.btn-save:hover{opacity:.85}
-.btn-clear{padding:6px 14px;border-radius:6px;border:1px solid var(--bd2);background:transparent;color:var(--tx3);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer}
-.saved-tag{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--gr);background:var(--gr-bg);border:1px solid var(--gr-bd);border-radius:20px;padding:2px 7px}
-.mi-derived{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;margin-top:4px}
-.smartrr-badge{display:inline-flex;align-items:center;gap:5px;font-size:9px;padding:2px 8px;border-radius:20px;margin-bottom:8px}
-.smartrr-ok{background:var(--gr-bg);color:var(--gr);border:1px solid var(--gr-bd)}
-.smartrr-warn{background:var(--am-bg);color:var(--am);border:1px solid var(--am-bd)}
-.cavali-only{display:none}
-.is-cavali .cavali-only{display:block}
-.corro-only{display:block}
-.is-cavali .corro-only{display:none}
-.foot{margin-top:20px;padding-top:12px;border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px}
-.foot-txt{font-size:10px;color:var(--tx3)}
-.foot-tags{display:flex;gap:5px;flex-wrap:wrap}
-.foot-tag{background:var(--sf2);border:1px solid var(--bd);border-radius:20px;padding:2px 8px;font-size:10px;color:var(--tx3)}
-.ov{display:none;position:fixed;inset:0;background:rgba(10,25,45,.72);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:10px;backdrop-filter:blur(3px)}
-.ov.show{display:flex}
-.spinner{width:24px;height:24px;border:2px solid var(--bd2);border-top-color:var(--gr);border-radius:50%;animation:spin .65s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.ov-lbl{font-size:11px;color:var(--tx);background:var(--sf);padding:7px 14px;border-radius:20px;border:1px solid var(--bd2)}
-.sk .kc-lbl,.sk .kc-val{background:var(--sf2);border-radius:3px;color:transparent;animation:shimmer 1.4s ease-in-out infinite}
-@keyframes shimmer{0%,100%{opacity:.3}50%{opacity:.8}}
-</style>
-</head>
-<body>
-<div class="ov" id="ov"><div class="spinner"></div><div class="ov-lbl" id="ov-lbl">Loading...</div></div>
-<div class="app" id="app-root">
-
-<!-- SIDEBAR -->
-<div class="sb">
-  <div class="sb-top">
-    <div class="sb-dots">
-      <div class="sb-dot" style="background:#2EE896"></div>
-      <div class="sb-dot" style="background:#A090FF"></div>
-    </div>
-    <div class="sb-name">Equestrian Labs, Inc.</div>
-    <div class="sb-sub">Analytics Suite</div>
-  </div>
-  <div class="sb-nav">
-    <div class="sb-sec">Performance</div>
-    <a class="sb-item on" href="#">
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="4" height="4" rx="1" fill="currentColor"/><rect x="7" y="1" width="4" height="4" rx="1" fill="currentColor" opacity=".4"/><rect x="1" y="7" width="4" height="4" rx="1" fill="currentColor" opacity=".4"/><rect x="7" y="7" width="4" height="4" rx="1" fill="currentColor" opacity=".4"/></svg>
-      Dashboard
-    </a>
-    <div class="sb-sec" style="margin-top:4px">Brands</div>
-    <a class="sb-item" href="#" onclick="setBrand('corro');return false">
-      <div style="width:5px;height:5px;border-radius:50%;background:#2EE896"></div>Corro
-    </a>
-    <a class="sb-item" href="#" onclick="setBrand('cavali');return false">
-      <div style="width:5px;height:5px;border-radius:50%;background:#A090FF"></div>Cavali
-    </a>
-    <div class="sb-sec" style="margin-top:6px">Analytics Suite</div>
-    <a class="sb-suite" href="https://arojas-company.github.io/corro-pareto/" target="_blank">
-      <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x=".5" y="6" width="2" height="4.5" rx=".5" fill="#D8B054"/><rect x="3.5" y="3.5" width="2" height="7" rx=".5" fill="#D8B054" opacity=".7"/><rect x="6.5" y="1" width="2" height="9.5" rx=".5" fill="#D8B054" opacity=".4"/></svg>
-      <span>Pareto Analysis</span>
-      <span class="sb-badge" style="background:rgba(216,176,84,.12);color:#D8B054;border:1px solid rgba(216,176,84,.25)">GP</span>
-    </a>
-    <a class="sb-suite" href="https://arojas-company.github.io/corro-frequency/" target="_blank">
-      <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="2" cy="5.5" r="1.5" fill="#72AEFF"/><circle cx="5.5" cy="3" r="1.5" fill="#72AEFF" opacity=".7"/><circle cx="9" cy="6.5" r="1.5" fill="#72AEFF" opacity=".4"/><path d="M2 5.5L5.5 3L9 6.5" stroke="#72AEFF" stroke-width="1" stroke-opacity=".4"/></svg>
-      <span>Frequency</span>
-      <span class="sb-badge" style="background:rgba(114,174,255,.12);color:#72AEFF;border:1px solid rgba(114,174,255,.25)">RET</span>
-    </a>
-    <a class="sb-suite" href="https://script.google.com/macros/s/AKfycbxz_0yvGe8QC7abvRApbh7zEwtSQQFp7HH38dWn2MRQ9f80f7PptvfUtyPhGU4WD_0QUA/exec" target="_blank">
-      <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1C4.7 1 2 2.5 2 4.5 2 7 3.5 9 5.5 10 7.5 9 9 7 9 4.5 9 2.5 6.3 1 5.5 1Z" fill="#A090FF" opacity=".35"/><path d="M3.5 5L5 6.5 7.5 4" stroke="#A090FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span>Concierge Comm.</span>
-      <span class="sb-badge" style="background:rgba(160,144,255,.12);color:#A090FF;border:1px solid rgba(160,144,255,.25)">$</span>
-    </a>
-  </div>
-  <div class="sb-foot">
-    <div class="sync-r"><div class="sync-d"></div>Auto-sync daily 8AM</div>
-    <div style="font-size:10px;color:var(--tx3);margin-top:2px" id="sb-upd">Shopify → Sheets</div>
-  </div>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-  <div class="ph">
-    <div>
-      <h1 id="ph-title">Corro — Performance</h1>
-      <p id="ph-sub">Shopify API · pipeline v4 · real gross profit · live data</p>
-    </div>
-    <div class="ph-r">
-      <div class="live-dot"><div style="width:5px;height:5px;border-radius:50%;background:var(--gr)"></div>Live</div>
-      <button class="rf-btn" onclick="forceRefresh()">
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M10 6a4 4 0 1 1-.8-2.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 2v2.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Refresh
-      </button>
-      <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">☀</button>
-    </div>
-  </div>
-
-  <div class="ctrl">
-    <div class="btn-grp" id="brand-grp">
-      <button class="brand-btn on" onclick="setBrand('corro')"><div style="width:5px;height:5px;border-radius:50%;background:#2EE896"></div>Corro</button>
-      <button class="brand-btn" onclick="setBrand('cavali')"><div style="width:5px;height:5px;border-radius:50%;background:#A090FF"></div>Cavali</button>
-    </div>
-    <div class="btn-grp" id="period-grp">
-      <button class="period-btn" onclick="setPT('week',this)">Week</button>
-      <button class="period-btn on" onclick="setPT('mtd',this)">MTD</button>
-      <button class="period-btn" onclick="setPT('month',this)">Month</button>
-      <button class="period-btn" onclick="setPT('quarter',this)">Quarter</button>
-    </div>
-  </div>
-
-  <div class="selbar" id="selbar"></div>
-  <div class="ibar" id="ibar"></div>
-  <div class="warn-bar" id="roas-warn">⚠ <strong>ROAS & CAC</strong> — Shopify attributed data is directional. Enter <strong>Google + Meta Ad Spend</strong> in Manual Inputs below for exact ROAS and CAC.</div>
-
-  <div class="sec"><div class="sec-num">01</div><div class="sec-line"></div><div class="sec-lbl">Website KPIs</div><div class="sec-line"></div></div>
-  <div class="kg" id="s-web"></div>
-
-  <div class="sec"><div class="sec-num">02</div><div class="sec-line"></div><div class="sec-lbl">Financial KPIs — Net Sales confirmed</div><div class="sec-line"></div></div>
-  <div class="kg" id="s-fin"></div>
-
-  <div class="corro-only" style="margin-top:7px"><div class="kg" id="s-fcs"></div></div>
-
-  <div class="panel open" id="rs-panel" style="margin-top:7px">
-    <div class="panel-hd" onclick="togglePanel('rs-panel')">
-      <div class="panel-title"><div class="panel-dot" style="background:var(--gr)"></div>Revenue Share by Channel · Net Sales + Gross Profit</div>
-      <span class="panel-chev">▾</span>
-    </div>
-    <div class="panel-body"><div class="rs-grid" id="rs-grid"><div style="font-size:11px;color:var(--tx3)">Loading...</div></div></div>
-  </div>
-
-  <div class="panel open" id="nvr-panel" style="margin-top:7px">
-    <div class="panel-hd" onclick="togglePanel('nvr-panel')">
-      <div class="panel-title"><div class="panel-dot" style="background:var(--bl)"></div>New vs Returning — Revenue + Gross Profit (real data)</div>
-      <span class="panel-chev">▾</span>
-    </div>
-    <div class="panel-body"><div class="nvr-grid" id="nvr-grid"><div style="font-size:11px;color:var(--tx3)">Loading...</div></div></div>
-  </div>
-
-  <div class="sec"><div class="sec-num">03</div><div class="sec-line"></div><div class="sec-lbl">Operational KPIs</div><div class="sec-line"></div></div>
-  <div class="kg" id="s-op"></div>
-
-  <div class="sec"><div class="sec-num">04</div><div class="sec-line"></div><div class="sec-lbl" id="mkt-lbl">Marketing KPIs</div><div class="sec-line"></div></div>
-  <div class="kg" id="s-mkt"></div>
-
-  <div class="sec"><div class="sec-num">05</div><div class="sec-line"></div><div class="sec-lbl">CAC to LTV — Ratio & Health</div><div class="sec-line"></div></div>
-  <div class="cac-note-box" id="cac-note-box">⏳ <strong>CAC note:</strong> When G+M spend is entered below, CAC is calculated automatically (G+M ÷ new customers from pipeline v4). Until full LTV data is ready, LTV uses the Shopify reference: <strong>$178</strong>. If no CAC can be calculated, CAC is shown only as a reference fallback: <strong>$47</strong>.</div>
-  <div class="cac-grid" id="s-cac"></div>
-
-  <!-- 06 · Cavali Subscribers (Smartrr) -->
-  <div class="cavali-only" id="subs-sec">
-    <div class="sec"><div class="sec-num">06</div><div class="sec-line"></div><div class="sec-lbl" style="color:var(--pu)">Cavali — Active Subscribers by Box · Smartrr</div><div class="sec-line"></div></div>
-    <div id="smartrr-status"></div>
-    <div class="kg" id="s-subs"></div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-num" id="q1-num">07</div>
-    <div class="sec-line"></div>
-    <div class="sec-lbl">Q1 2026 Snapshot</div>
-    <div class="sec-line"></div>
-  </div>
-  <div class="kg" id="q1-grid"></div>
-  <div style="font-size:10px;color:var(--tx3);margin-top:5px" id="q1-note"></div>
-
-  <div class="sec">
-    <div class="sec-num" id="mi-num">08</div>
-    <div class="sec-line"></div>
-    <div class="sec-lbl">Manual Inputs — Ad Spend · CAC · LTV</div>
-    <div class="sec-line"></div>
-  </div>
-  <div class="panel open" id="mi-panel">
-    <div class="panel-hd" onclick="togglePanel('mi-panel')">
-      <div class="panel-title"><div class="panel-dot" style="background:var(--gd)"></div>Ad Spend · ROAS · CAC · LTV — manual data entry</div>
-      <span class="panel-chev">▾</span>
-    </div>
-    <div class="panel-body">
-      <div style="font-size:10px;color:var(--tx3);margin-bottom:10px">Values saved locally per brand + period. CAC is calculated automatically with G+M spend ÷ new customers (pipeline v4). LTV override optional — default $178.</div>
-      <div class="mi-grid">
-        <div class="mi-field">
-          <div class="mi-lbl">Google + Meta Ad Spend ($)<span class="mi-note">G+M only — for exact ROAS & CAC</span></div>
-          <div class="mi-wrap"><span class="mi-pre">$</span><input class="mi-inp" id="mi-spend" type="number" min="0" step="0.01" placeholder="0.00" oninput="calcDerived()"></div>
-        </div>
-        <div class="mi-field">
-          <div class="mi-lbl">New Customers (period)<span class="mi-note">Auto from pipeline v4 if available</span></div>
-          <div class="mi-wrap"><input class="mi-inp no-pre" id="mi-newcust" type="number" min="0" step="1" placeholder="0" oninput="calcDerived()"></div>
-        </div>
-        <div class="mi-field">
-          <div class="mi-lbl">LTV-12M ($ per customer)<span class="mi-note">Default: $178 (Shopify ref)</span></div>
-          <div class="mi-wrap"><span class="mi-pre">$</span><input class="mi-inp" id="mi-ltv" type="number" min="0" step="0.01" placeholder="178.00" oninput="calcDerived()"></div>
-        </div>
-        <div class="mi-field">
-          <div class="mi-lbl">CAC Override ($)<span class="mi-note">Auto-calculated if G+M spend entered</span></div>
-          <div class="mi-wrap"><span class="mi-pre">$</span><input class="mi-inp" id="mi-cac-ov" type="number" min="0" step="0.01" placeholder="auto" oninput="calcDerived()"></div>
-        </div>
-        <div class="mi-field">
-          <div class="mi-lbl">Net Sales Override ($)<span class="mi-note">Auto from Sheets if empty</span></div>
-          <div class="mi-wrap"><span class="mi-pre">$</span><input class="mi-inp" id="mi-ns" type="number" min="0" step="0.01" placeholder="auto" oninput="calcDerived()"></div>
-        </div>
-        <div class="mi-field cavali-only">
-          <div class="mi-lbl" style="color:var(--pu)">Subscribers manual (optional override)</div>
-          <div class="mi-sub-grid">
-            <div><div class="mi-sub-lbl">Seasonal</div><input class="mi-inp no-pre" id="mi-sea" type="number" min="0" placeholder="0" oninput="renderSubsFallback()"></div>
-            <div><div class="mi-sub-lbl">Signature</div><input class="mi-inp no-pre" id="mi-sig" type="number" min="0" placeholder="0" oninput="renderSubsFallback()"></div>
-            <div><div class="mi-sub-lbl">Premier</div><input class="mi-inp no-pre" id="mi-pre-sub" type="number" min="0" placeholder="0" oninput="renderSubsFallback()"></div>
-          </div>
-        </div>
-      </div>
-      <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:7px">Calculated (Google+Meta)</div>
-      <div class="mi-derived" id="mi-derived"></div>
-      <div class="mi-actions">
-        <button class="btn-save" onclick="saveManual()">Save for this period</button>
-        <button class="btn-clear" onclick="clearManual()">Clear</button>
-        <span id="mi-msg"></span>
-      </div>
-    </div>
-  </div>
-
-  <div class="foot">
-    <div class="foot-txt" id="foot-txt">Last updated: —</div>
-    <div class="foot-tags">
-      <div class="foot-tag">Shopify API</div>
-      <div class="foot-tag">Pipeline v4</div>
-      <div class="foot-tag">Google Sheets</div>
-      <div class="foot-tag">Auto-daily 8AM</div>
-      <div class="foot-tag" id="ft-manual" style="display:none;color:var(--gd)">G+M Manual active</div>
-      <div class="foot-tag" id="ft-roas" style="color:var(--am)">ROAS: Shopify ⚠</div>
-      <div class="foot-tag cavali-only" id="ft-smartrr" style="color:var(--pu)">Smartrr</div>
-    </div>
-  </div>
-
-</div><!-- /main -->
-</div><!-- /app -->
-
-<script>
-/* ══════════════════════════════════════════════════════
-   CONFIG
-   ─────────────────────────────────────────────────────
-   Shopify data is read from Google Sheets.
-   Smartrr keys must NOT live in this static HTML. Smartrr is fetched
-   by the GitHub Actions pipeline and written to the `smartrr_subscribers` tab.
-══════════════════════════════════════════════════════ */
-const SIDS = {
-  corro:  "1nq8xkDzowAvhD3wpMBlVK2M3FZSNS2DrAiPxz-Y2tdU",
-  cavali: "1QUdJc2EIdElIX5nlLQxWxS98aAz-TgQnSg9glJpNtig",
-};
-const AKEY = "AIzaSyD8oIf_TyxchEkU_MpKJXngrjrMVyV81oY";
-
-const CAVALI_RENAME = {
-  "Others":           "Subscriptions",
-  "Online":           "Single Products",
-  "Wellington (POS)": null,
-  "Concierge":        "Concierge",
-};
-const CH_COLORS = {
-  "Wellington (POS)": "#D8B054",
-  "Concierge":        "#A090FF",
-  "Online":           "#72AEFF",
-  "Single Products":  "#72AEFF",
-  "Others":           "#707070",
-  "Subscriptions":    "#2EE896",
-};
-
-let brand = "corro", ptype = "mtd";
-let cache = {}, manualData = {};
-
-/* ══════════════════════════════════════════════════════
-   SMARTRR
-   Reads the real active subscriber split from the smartrr_subscribers tab.
-   Python creates that tab from Smartrr ACTIVE subscriptions and classifies by product/box:
-   Cavali Club Membership / The Signature Box / The Premier Box / Junior.
-══════════════════════════════════════════════════════ */
-let _smartrrCache = null, _smartrrTs = 0;
-
-function _smartrrNum(v) {
-  const n = parseFloat(String(v ?? "").replace(/,/g, "").trim());
-  return isNaN(n) ? 0 : n;
-}
-
-async function fetchSmartrrSubs() {
-  if (brand !== "cavali") return null;
-  if (_smartrrCache && Date.now() - _smartrrTs < 10 * 60 * 1000) return _smartrrCache;
-
-  const sid = SIDS[brand];
-  const rows = await fetchTab(sid, "smartrr_subscribers");
-  if (!rows || !rows.length) return null;
-
-  const candidates = rows.filter(r => (r.brand || "cavali").toLowerCase() === "cavali");
-  const row = bestRow(candidates.length ? candidates : rows);
-  if (!row) return null;
-
-  const sea = _smartrrNum(row.seasonal);
-  const sig = _smartrrNum(row.signature);
-  const pre = _smartrrNum(row.premier);
-  const jun = _smartrrNum(row.junior);
-  const other = _smartrrNum(row.other);
-  const total = _smartrrNum(row.total_subscribers) || (sea + sig + pre + jun + other);
-
-  _smartrrCache = {
-    sea, sig, pre, jun, other, total,
-    updated_at: row.updated_at || "",
-    source: row.source || "Smartrr → Sheets",
-    error: row.error || ""
-  };
-  _smartrrTs = Date.now();
-  return _smartrrCache;
-}
-
-/* ══════════════════════════════════════════════════════
-   DATE HELPERS
-══════════════════════════════════════════════════════ */
-
-const NOW = new Date(), CY = NOW.getFullYear(), CM = NOW.getMonth();
-const MN  = ["January","February","March","April","May","June",
-              "July","August","September","October","November","December"];
-const DEFAULT_LTV_12M = 178;
-const DEFAULT_CAC_REF = 47;
-
-function iso(d) {
-  if (!(d instanceof Date)) return String(d);
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-function lastDay(y, m) { return new Date(y, m+1, 0); }
-function fmtD(s) {
-  try { return new Date(s+'T12:00').toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'}); }
-  catch(e) { return s||"—"; }
-}
-function dateFromISO(s) { return new Date((s||"") + 'T12:00'); }
-function mtdRange(y, month1, dayLimit) {
-  const m0 = month1 - 1;
-  const endDay = Math.min(dayLimit || 1, lastDay(y, m0).getDate());
-  return {
-    start: `${y}-${String(month1).padStart(2,'0')}-01`,
-    end: iso(new Date(y, m0, endDay)),
-  };
-}
-function exactRow(rows, pk, start, end) {
-  if (!rows?.length) return null;
-  const st = String(start || "").trim(), en = String(end || "").trim();
-  let m = rows.filter(r => (r.period || "").trim() === pk && (r.period_start || "").trim() === st && (r.period_end || "").trim() === en);
-  if (m.length) return bestRow(m);
-  m = rows.filter(r => (r.period || "").trim() === pk && (r.period_end || "").trim() === en);
-  if (m.length) return bestRow(m);
-  m = rows.filter(r => (r.period_start || "").trim() === st && (r.period_end || "").trim() === en && String(r.period || "").startsWith("mtd_"));
-  return m.length ? bestRow(m) : null;
-}
-function isFullMonthOpt(opt) {
-  if (!opt || opt.y === undefined || opt.m === undefined) return false;
-  return opt.end === iso(lastDay(opt.y, opt.m));
-}
-
-function buildWeeks() {
-  const out = [], tod = new Date(NOW), dow = tod.getDay(), mon = new Date(tod);
-  mon.setDate(tod.getDate() - (dow === 0 ? 6 : dow - 1));
-  for (let i = 0; i < 200; i++) {
-    const m = new Date(mon); m.setDate(mon.getDate() - i*7);
-    if (m.getFullYear() < 2024) break;
-    const s = new Date(m); s.setDate(m.getDate() + 6);
-    const e = s > NOW ? new Date(NOW) : s;
-    out.push({ val: iso(m)+'__'+iso(e), label: `${m.toLocaleDateString('en',{month:'short',day:'numeric'})} – ${e.toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'})}`, start: iso(m), end: iso(e) });
-  }
-  return out;
-}
-function buildMTDs() {
-  const out = [];
-  const dayLimit = NOW.getDate();
-  for (let y = CY; y >= 2024; y--) {
-    for (let m = (y===CY?CM:11); m >= 0; m--) {
-      const cur = y===CY&&m===CM;
-      const rg = mtdRange(y, m+1, dayLimit);
-      const e = cur ? iso(NOW) : rg.end;
-      out.push({ val: rg.start+'__'+e, label: `${MN[m]} ${y}${cur?' (MTD)':''}`, start: rg.start, end: e, m, y, cur });
-    }
-  }
-  return out;
-}
-function buildMonths() {
-  const out = [];
-  for (let y = CY; y >= 2024; y--) {
-    for (let m = (y===CY?CM:11); m >= 0; m--) {
-      const cur = y===CY&&m===CM;
-      const s = `${y}-${String(m+1).padStart(2,'0')}-01`;
-      // Current month is not complete yet, so it behaves like MTD and compares date-to-date.
-      const e = cur ? iso(NOW) : iso(lastDay(y,m));
-      out.push({ val: s+'__'+e, label: `${MN[m]} ${y}${cur?' (current MTD)':''}`, start: s, end: e, m, y, cur });
-    }
-  }
-  return out;
-}
-function buildQuarters() {
-  const out = [];
-  for (let y = CY; y >= 2024; y--) {
-    const maxQ = y===CY ? Math.floor(CM/3)+1 : 4;
-    for (let q = maxQ; q >= 1; q--) {
-      const qs = new Date(y,(q-1)*3,1), qe = new Date(y,q*3,0), cur = y===CY&&q===maxQ;
-      const e = cur ? iso(NOW) : iso(qe), pk = `q${q}_${y}`;
-      out.push({ val: pk, label: `Q${q} ${y}${cur?' (current)':''}`, start: iso(qs), end: e, q, y, pk, cur });
-    }
-  }
-  return out;
-}
-
-const WEEKS = buildWeeks(), MTDS = buildMTDs(), MONTHS = buildMonths(), QUARTERS = buildQuarters();
-let selW = WEEKS[0]?.val||"", selMTD = MTDS[0]?.val||"", selMo = MONTHS[0]?.val||"", selQ = QUARTERS[0]?.val||"", selCmp = "prev";
-
-function getOpt() {
-  if (ptype==="week")   return WEEKS.find(o=>o.val===selW)||WEEKS[0]||{};
-  if (ptype==="mtd")    return MTDS.find(o=>o.val===selMTD)||MTDS[0]||{};
-  if (ptype==="month")  return MONTHS.find(o=>o.val===selMo)||MONTHS[0]||{};
-  return QUARTERS.find(o=>o.val===selQ)||QUARTERS[0]||{};
-}
-
-/* ══════════════════════════════════════════════════════
-   SELECTOR BAR
-══════════════════════════════════════════════════════ */
-function renderSelbar() {
-  const bar = document.getElementById("selbar"); if (!bar) return;
-  let opts, sv, oc;
-  if (ptype==="week")       { opts=WEEKS;    sv=selW;   oc="onSelW(this.value)"; }
-  else if (ptype==="mtd")   { opts=MTDS;     sv=selMTD; oc="onSelMTD(this.value)"; }
-  else if (ptype==="month") { opts=MONTHS;   sv=selMo;  oc="onSelMo(this.value)"; }
-  else                      { opts=QUARTERS; sv=selQ;   oc="onSelQ(this.value)"; }
-  const lbls = {week:"Select week",mtd:"Select month (MTD)",month:"Select month",quarter:"Select quarter"};
-  bar.innerHTML =
-    `<div class="sel-grp"><span class="sel-lbl">${lbls[ptype]}</span>` +
-    `<select onchange="${oc}">${(opts||[]).map(o=>`<option value="${o.val}"${o.val===sv?' selected':''}>${o.label}</option>`).join('')}</select></div>` +
-    `<div class="sel-div"></div>` +
-    `<div class="sel-grp"><span class="sel-lbl">Compare vs</span>` +
-    `<select onchange="selCmp2(this.value)">` +
-    `<option value="prev"${selCmp==="prev"?' selected':''}>Previous period</option>` +
-    `<option value="yoy"${selCmp==="yoy"?' selected':''}>Same period last year (YOY)</option>` +
-    `<option value="none"${selCmp==="none"?' selected':''}>No comparison</option>` +
-    `</select></div>`;
-}
-function onSelW(v)   { selW   = v; cache={}; renderSelbar(); render(); }
-function onSelMTD(v) { selMTD = v; cache={}; renderSelbar(); render(); }
-function onSelMo(v)  { selMo  = v; cache={}; renderSelbar(); render(); }
-function onSelQ(v)   { selQ   = v; cache={}; renderSelbar(); render(); }
-function selCmp2(v)  { selCmp = v; render(); }
-
-function renderIbar(opt, cmpLbl) {
-  const el = document.getElementById("ibar"); if (!el) return;
-  let h = `<span>${fmtD(opt.start)}</span> – <span>${fmtD(opt.end)}</span>`;
-  if (cmpLbl) h += ` &nbsp;·&nbsp; vs <span>${cmpLbl}</span>`;
-  h += ` &nbsp;·&nbsp; <span>Net Sales confirmed ✓</span>`;
-  el.innerHTML = h;
-}
-
-/* ══════════════════════════════════════════════════════
-   SHEETS FETCH (5-min cache)
-══════════════════════════════════════════════════════ */
-async function fetchTab(sid, tab) {
-  const k = `${sid}__${tab}`;
-  if (cache[k]) return cache[k];
-  try {
-    const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sid}/values/${encodeURIComponent(tab)}?key=${AKEY}`);
-    if (!r.ok) { console.warn(`Tab ${tab} HTTP ${r.status}`); return []; }
-    const d = await r.json(), rows = d.values||[];
-    if (rows.length < 2) return [];
-    const h = rows[0], res = rows.slice(1).map(row => Object.fromEntries(h.map((hh,i)=>[hh,row[i]||""])));
-    cache[k] = res;
-    setTimeout(()=>delete cache[k], 5*60*1000);
-    return res;
-  } catch(e) { console.error(e); return []; }
-}
-
-function bestRow(arr) {
-  if (!arr || !arr.length) return null;
-  return arr.sort((a,b) => (Date.parse(b.updated_at)||0) - (Date.parse(a.updated_at)||0))[0] || null;
-}
-
-function findRow(rows, opt) {
-  if (!rows?.length) return null;
-  let m;
-  if (ptype==="quarter" && opt.pk) { m=rows.filter(r=>r.period===opt.pk); if(m.length) return bestRow(m); }
-  if (ptype==="week") {
-    const pk=`week_${opt.start}`;
-    m = rows.filter(r=>r.period===pk);
-    if (m.length) { const ex=m.filter(r=>(r.period_end||"").trim()===opt.end); return bestRow(ex.length?ex:m); }
-    m = rows.filter(r=>r.period_start===opt.start&&r.period_end===opt.end&&(r.period||"").startsWith("week_"));
-    if (m.length) return bestRow(m);
-  }
-  if (ptype==="mtd") {
-    const pk=`mtd_${(opt.start||"").slice(0,7)}`;
-    const exact = exactRow(rows, pk, opt.start, opt.end);
-    if (exact) return exact;
-    m=rows.filter(r=>r.period==="mtd"&&r.period_start===opt.start&&r.period_end===opt.end); if(m.length) return bestRow(m);
-    // Important: do not fall back to the full month for MTD. It creates false negative comparisons.
-  }
-  if (ptype==="month") {
-    const pk=(opt.start||"").slice(0,7);
-    if (!isFullMonthOpt(opt)) {
-      const mtd = exactRow(rows, `mtd_${pk}`, opt.start, opt.end);
-      if (mtd) return mtd;
-    }
-    m=rows.filter(r=>r.period===pk); if(m.length) return bestRow(m);
-    m=rows.filter(r=>r.period_start===opt.start&&r.period_end===opt.end); if(m.length) return bestRow(m);
-  }
-  return null;
-}
-
-function findCmp(rows, opt) {
-  if (!rows?.length || selCmp==="none") return { row:null, lbl:"" };
-  const prev = selCmp==="prev";
-  if (ptype==="quarter" && opt.pk) {
-    const match = opt.pk.match(/q(\d)_(\d{4})/);
-    if (match) {
-      const [,q,y] = match;
-      const pq = prev ? (parseInt(q)===1?4:parseInt(q)-1) : parseInt(q);
-      const py = prev ? (parseInt(q)===1?parseInt(y)-1:parseInt(y)) : parseInt(y)-1;
-      const pk = `q${pq}_${py}`;
-      return { row: bestRow(rows.filter(r=>r.period===pk)), lbl: prev?`Q${pq} ${py}`:`Q${q} ${py}` };
-    }
-  }
-  if (ptype==="mtd") {
-    const yr=parseInt((opt.start||"").slice(0,4)), mo=parseInt((opt.start||"").slice(5,7));
-    const dayLimit = dateFromISO(opt.end).getDate();
-    if (!isNaN(yr) && !isNaN(mo) && !isNaN(dayLimit)) {
-      const [pmo,py] = prev ? [mo===1?12:mo-1, mo===1?yr-1:yr] : [mo, yr-1];
-      const pk=`mtd_${py}-${String(pmo).padStart(2,'0')}`;
-      const rg = mtdRange(py, pmo, dayLimit);
-      const row = exactRow(rows, pk, rg.start, rg.end);
-      return { row, lbl:`${fmtD(rg.start)} – ${fmtD(rg.end)}${prev?'':' (YOY)'}` };
-    }
-  }
-  if (ptype==="month") {
-    const yr=parseInt((opt.start||"").slice(0,4)), mo=parseInt((opt.start||"").slice(5,7));
-    if (!isNaN(yr) && !isNaN(mo)) {
-      const [pmo,py] = prev ? [mo===1?12:mo-1, mo===1?yr-1:yr] : [mo, yr-1];
-      if (!isFullMonthOpt(opt)) {
-        const dayLimit = dateFromISO(opt.end).getDate();
-        const rg = mtdRange(py, pmo, dayLimit);
-        const pk = `mtd_${py}-${String(pmo).padStart(2,'0')}`;
-        const row = exactRow(rows, pk, rg.start, rg.end);
-        return { row, lbl:`${fmtD(rg.start)} – ${fmtD(rg.end)}${prev?'':' (YOY)'}` };
-      }
-      const pk=`${py}-${String(pmo).padStart(2,'0')}`;
-      const lbl=new Date(py,pmo-1,1).toLocaleDateString('en',{month:'long',year:'numeric'});
-      return { row:bestRow(rows.filter(r=>r.period===pk))||null, lbl:prev?lbl:`${lbl} (YOY)` };
-    }
-  }
-  if (ptype==="week") {
-    const days = prev ? 7 : 364;
-    try {
-      const ms=new Date(opt.start+'T12:00'); ms.setDate(ms.getDate()-days);
-      const me=new Date(opt.end+'T12:00');   me.setDate(me.getDate()-days);
-      const pk=`week_${iso(ms)}`;
-      let m=rows.filter(r=>r.period===pk);
-      if (!m.length) m=rows.filter(r=>r.period_start===iso(ms)&&r.period_end===iso(me));
-      return { row:bestRow(m)||null, lbl:`${fmtD(iso(ms))} – ${fmtD(iso(me))}${prev?'':' (YOY)'}` };
-    } catch(e) {}
-  }
-  return { row:null, lbl:"" };
-}
-
-/* ══════════════════════════════════════════════════════
-   FORMAT HELPERS
-══════════════════════════════════════════════════════ */
-function fv(v, f) {
-  if (v===null||v===undefined||v==="") return "—";
-  const n = parseFloat(v); if (isNaN(n)) return "—";
-  if (f==="$") { if(Math.abs(n)>=1e6) return "$"+(n/1e6).toFixed(2)+"M"; if(Math.abs(n)>=1000) return "$"+(n/1000).toFixed(1)+"K"; return "$"+n.toFixed(0); }
-  if (f==="%") return n.toFixed(1)+"%";
-  if (f==="x") return n.toFixed(2)+"x";
-  if (Math.abs(n)>=1e6) return (n/1e6).toFixed(1)+"M";
-  if (Math.abs(n)>=1000) return (n/1000).toFixed(1)+"K";
-  return n%1===0 ? n.toLocaleString() : n.toFixed(2);
-}
-function pctChg(c, p) {
-  const cv=parseFloat(c), pv=parseFloat(p);
-  if (isNaN(cv)||isNaN(pv)||pv===0) return null;
-  return ((cv-pv)/Math.abs(pv)*100).toFixed(1);
-}
-function badge(pct, lbl, inv) {
-  if (pct===null||pct===undefined) return `<span class="bdg bdg-neu"><span class="bdg-lbl">${lbl||"vs"}</span>—</span>`;
-  const n=parseFloat(pct), up=n>=0, good=inv?!up:up;
-  const arr = up
-    ? `<svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 6V2M2 4l2-2 2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-    : `<svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 2v4M2 4l2 2 2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  return `<span class="bdg ${good?'bdg-up':'bdg-dn'}">${arr}<span class="bdg-lbl">${lbl||"vs"}</span>${up?'+':''}${Math.abs(n).toFixed(1)}%</span>`;
-}
-function badgeAmber(txt) { return `<span class="bdg bdg-am">⚠ ${txt}</span>`; }
-
-function kcard(lbl, val, pct, cmpL, note, acc, inv) {
-  const n = pct!==null&&pct!==undefined ? parseFloat(pct) : null;
-  const col = n!==null ? ((inv?n<=0:n>=0)?"var(--gr)":"var(--rd)") : (acc||"var(--bd)");
-  return `<div class="kc"><div class="kc-bar" style="background:${col}"></div><div class="kc-lbl">${lbl}</div><div class="kc-val">${val}</div><div class="kc-badges">${badge(pct,cmpL||"vs",inv)}</div>${note?`<div class="kc-note">${note}</div>`:""}</div>`;
-}
-function kcardAmber(lbl, val, warnTxt, note) {
-  return `<div class="kc"><div class="kc-bar" style="background:var(--am)"></div><div class="kc-lbl">${lbl}</div><div class="kc-val">${val}</div><div class="kc-badges">${badgeAmber(warnTxt)}</div>${note?`<div class="kc-note" style="color:var(--am)">${note}</div>`:""}</div>`;
-}
-function skel(n) { return Array(n).fill(`<div class="kc sk"><div class="kc-lbl" style="width:55%;height:9px"> </div><div class="kc-val" style="height:21px;margin-top:8px"> </div></div>`).join(''); }
-
-function resolveGrossProfit(row) {
-  const direct = parseFloat(row.gross_profit||"");
-  if (!isNaN(direct) && direct !== 0) return direct;
-  const ns = parseFloat(row.net_sales||0);
-  const gm = parseFloat(row.pct_gm||0);
-  if (ns > 0 && gm > 0) return ns * gm / 100;
-  const cogs = parseFloat(row.cogs||0);
-  if (ns > 0 && cogs > 0) return ns - cogs;
-  return null;
-}
-
-const DEFS = {
-  web: [
-    { k:"sessions",         l:"Sessions",         f:"",  n:"Via ShopifyQL" },
-    { k:"unique_visitors",  l:"Unique Visitors",  f:"",  n:"85% of sessions" },
-    { k:"conversion_rate",  l:"Conv. Rate",        f:"%", n:"Orders ÷ Sessions" },
-  ],
-  fin: [
-    { k:"gross_sales",    l:"Gross Sales",    f:"$" },
-    { k:"net_sales",      l:"Net Sales",      f:"$",  n:"Confirmed: all revenue figures are Net Sales" },
-    { k:"gross_profit",   l:"Gross Profit",   f:"$",  n:"FROM sales: net_sales − COGS (Shopify)", computed: true },
-    { k:"pct_gm",         l:"Gross Margin",   f:"%" },
-    { k:"total_discounts",l:"Discounts",      f:"$",  inv:true },
-    { k:"total_returns",  l:"Returns",        f:"$",  inv:true },
-    { k:"pct_discount",   l:"% Discount",     f:"%",  inv:true },
-    { k:"pct_returns",    l:"% Returns",      f:"%",  inv:true },
-    { k:"cogs",           l:"COGS",           f:"$",  inv:true },
-  ],
-  op: [
-    { k:"nb_orders",       l:"Orders",          f:"" },
-    { k:"nb_units",        l:"Units Sold",       f:"" },
-    { k:"units_per_order", l:"Units / Order",    f:"" },
-    { k:"aov",             l:"AOV",              f:"$", n:"Net Sales ÷ Orders" },
-  ],
-};
-
-/* ══════════════════════════════════════════════════════
-   FCS FORECAST (Corro only)
-══════════════════════════════════════════════════════ */
-function renderFCS(row) {
-  const el = document.getElementById("s-fcs"); if (!el) return;
-  if (brand !== "corro" || !row) { el.innerHTML = ""; return; }
-  const net = parseFloat(row.net_sales||0);
-  const today = new Date(), day = today.getDate();
-  const daysInMonth = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
-  const rate = net / Math.max(1, day);
-  const fcs  = rate * daysInMonth;
-  const pct  = Math.round(day/daysInMonth*100);
-  el.innerHTML = `
-    <div class="kc-fcs">
-      <div class="kc-bar" style="background:#72AEFF;height:3px;position:absolute;top:0;left:0;right:0"></div>
-      <div class="kc-lbl">FCS — Linear Month Forecast (Net Sales)</div>
-      <div class="kc-val">${fv(fcs,"$")}</div>
-      <div class="kc-badges"><span class="bdg" style="background:rgba(114,174,255,.15);color:#72AEFF;border:1px solid rgba(114,174,255,.3)">Projected end of month</span></div>
-      <div class="kc-note">Day ${day}/${daysInMonth} (${pct}%) · Daily rate: ${fv(rate,"$")} · Actual so far: ${fv(net,"$")}</div>
-    </div>`;
-}
-
-/* ══════════════════════════════════════════════════════
-   REVENUE SHARE
-══════════════════════════════════════════════════════ */
-function renderRS(rsRows, row) {
-  const el  = document.getElementById("rs-grid"); if (!el) return;
-  const opt = getOpt();
-  const pk  = row?.period;
-  let ch = pk
-    ? (rsRows||[]).filter(r=>r.period===pk)
-    : (rsRows||[]).filter(r=>(r.period_start||"").slice(0,7)===(opt.start||"").slice(0,7));
-
-  if (brand==="cavali") {
-    ch = ch.map(r => {
-      const nm = CAVALI_RENAME[r.channel];
-      return nm===null ? null : { ...r, channel: nm||r.channel };
-    }).filter(Boolean);
-  }
-
-  if (!ch.length) { el.innerHTML=`<div style="font-size:11px;color:var(--tx3)">No data for this period.</div>`; return; }
-
-  el.innerHTML = ch.map(r => {
-    const pct  = parseFloat(r.pct)||0;
-    const amt  = parseFloat(r.amount)||0;
-    const gp   = parseFloat(r.gross_profit)||0;
-    const gm   = parseFloat(r.gross_margin)||0;
-    const chg  = r.pct_chg&&r.pct_chg!==""?parseFloat(r.pct_chg):null;
-    const isEst= (r.gp_is_estimate||"").toLowerCase()==="true";
-    const col  = CH_COLORS[r.channel]||"#707070";
-    const chgH = chg!==null ? `<div style="font-size:9px;margin-top:3px;color:${chg>=0?'var(--gr)':'var(--rd)'}">${chg>=0?'▲':'▼'} ${Math.abs(chg).toFixed(1)}pp vs prev</div>` : "";
-    const gpDisplay = gp > 0 ? fv(gp,"$") : (gm > 0 ? fv(amt * gm / 100,"$") : "—");
-    const gmDisplay = gm > 0 ? gm.toFixed(1)+"%" : "—";
-    const gpH  = `<div class="rs-gp">GP: <span style="color:var(--gr)">${gpDisplay}</span> · <span style="color:var(--gr)">${gmDisplay}</span>${isEst?' <span style="color:var(--am)">(est)</span>':''}</div>`;
-    return `<div class="rs-card">
-      <div class="rs-name">${r.channel}</div>
-      <div class="rs-pct" style="color:${col}">${pct.toFixed(1)}%</div>
-      <div class="rs-amt">${fv(amt,"$")}</div>
-      ${chgH}${gpH}
-      <div class="rs-bar-wrap"><div class="rs-bar-fill" style="width:${Math.min(pct,100)}%;background:${col}"></div></div>
-    </div>`;
-  }).join('');
-}
-
-/* ══════════════════════════════════════════════════════
-   NEW vs RETURNING
-   Now reads from new_vs_returning tab (populated via REST orders_count)
-══════════════════════════════════════════════════════ */
-function renderNVR(nvrRows, kpiRow) {
-  const el  = document.getElementById("nvr-grid"); if (!el) return;
-  const opt = getOpt();
-  const pk  = kpiRow?.period;
-  let nvrRow = null;
-
-  if (nvrRows?.length) {
-    if (pk) nvrRow = nvrRows.find(r=>r.period===pk) || null;
-    if (!nvrRow) nvrRow = nvrRows.find(r=>(r.period_start||"").slice(0,7)===(opt.start||"").slice(0,7)) || null;
-  }
-
-  // Fallback: read from kpiRow if nvr tab has no data yet
-  const src = nvrRow || kpiRow;
-  if (!src) {
-    el.innerHTML=`<div style="font-size:11px;color:var(--tx3);grid-column:1/-1">No new/returning data. Run pipeline v4 then refresh.</div>`;
-    return;
-  }
-
-  const newRev  = parseFloat(src.new_revenue||0);
-  const retRev  = parseFloat(src.returning_revenue||0);
-  const newGP   = parseFloat(src.new_gross_profit||0);
-  const retGP   = parseFloat(src.returning_gross_profit||0);
-  const newNC   = parseInt(src.new_customers||0);
-  const retNC   = parseInt(src.returning_customers||0);
-  const total   = newRev + retRev;
-  const isReal  = newRev > 0 || retRev > 0;
-  const src_lbl = nvrRow ? "Pipeline v4 · REST orders_count" : "kpis_daily fallback";
-  const noDataNote = !isReal ? `<div class="nvr-note">⚠ No revenue data — run pipeline v4</div>` : "";
-
-  el.innerHTML = `
-    <div class="nvr-col">
-      <div class="nvr-title" style="color:var(--bl)">
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="#72AEFF" stroke-width="1.5"/><path d="M5 3v4M3 5h4" stroke="#72AEFF" stroke-width="1.2" stroke-linecap="round"/></svg>
-        New Customers
-      </div>
-      <div class="nvr-row"><span class="nvr-lbl">Orders / Customers</span><span class="nvr-val">${newNC||"—"}</span></div>
-      <div class="nvr-row"><span class="nvr-lbl">Revenue</span><span class="nvr-val">${fv(newRev,"$")}</span></div>
-      <div class="nvr-row"><span class="nvr-lbl">Gross Profit</span><span class="nvr-val nvr-gp">${fv(newGP,"$")}</span></div>
-      <div class="nvr-row"><span class="nvr-lbl">% of Total</span><span class="nvr-val">${total?(newRev/total*100).toFixed(1)+"%":"—"}</span></div>
-      ${noDataNote}
-      <div class="nvr-note" style="color:var(--tx3)">${src_lbl}</div>
-    </div>
-    <div class="nvr-col">
-      <div class="nvr-title" style="color:var(--gr)">
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M7 3c0-1.1-.9-2-2-2S3 1.9 3 3s.9 2 2 2 2-.9 2-2z" stroke="#2EE896" stroke-width="1.2"/><path d="M1.5 9c0-1.9 1.6-3.5 3.5-3.5S8.5 7.1 8.5 9" stroke="#2EE896" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Returning Customers
-      </div>
-      <div class="nvr-row"><span class="nvr-lbl">Orders / Customers</span><span class="nvr-val">${retNC||"—"}</span></div>
-      <div class="nvr-row"><span class="nvr-lbl">Revenue</span><span class="nvr-val">${fv(retRev,"$")}</span></div>
-      <div class="nvr-row"><span class="nvr-lbl">Gross Profit</span><span class="nvr-val nvr-gp">${fv(retGP,"$")}</span></div>
-      <div class="nvr-row"><span class="nvr-lbl">% of Total</span><span class="nvr-val">${total?(retRev/total*100).toFixed(1)+"%":"—"}</span></div>
-      ${noDataNote}
-    </div>`;
-}
-
-/* ══════════════════════════════════════════════════════
-   CAC to LTV
-══════════════════════════════════════════════════════ */
-function renderCAC(cacVal, ltvVal, source) {
-  const el = document.getElementById("s-cac"); if (!el) return;
-  const ltv = ltvVal > 0 ? ltvVal : DEFAULT_LTV_12M;
-  const cac = cacVal > 0 ? cacVal : DEFAULT_CAC_REF;
-  const hasActualCAC = cacVal > 0;
-  const hasManualLTV = ltvVal > 0;
-  const ratio = ltv / cac;
-  const health = ratio >= 3 ? "✅ Healthy (≥3x)" : ratio >= 2 ? "⚠ Acceptable (2–3x)" : "🔴 Low (<2x)";
-  const hcol   = ratio >= 3 ? "var(--gr)" : ratio >= 2 ? "var(--am)" : "var(--rd)";
-  const hbg    = ratio >= 3 ? "var(--gr-bg)" : ratio >= 2 ? "var(--am-bg)" : "var(--rd-bg)";
-  const hbd    = ratio >= 3 ? "var(--gr-bd)" : ratio >= 2 ? "var(--am-bd)" : "var(--rd-bd)";
-  const cacNote = hasActualCAC ? (source || "Calculated") : "Reference fallback: ~$47";
-  el.innerHTML = `
-    <div class="kc"><div class="kc-bar" style="background:var(--bl)"></div>
-      <div class="kc-lbl">LTV (12M)</div>
-      <div class="kc-val" style="color:var(--bl)">${fv(ltv,"$")}</div>
-      <div class="kc-note">${hasManualLTV?"Manual entry":"Shopify reference: $178"}</div></div>
-    <div class="kc"><div class="kc-bar" style="background:var(--gd)"></div>
-      <div class="kc-lbl">CAC${hasActualCAC&&source?" ("+source+")":""}</div>
-      <div class="kc-val" style="color:var(--gd)">${fv(cac,"$")}</div>
-      <div class="kc-note">${cacNote}</div></div>
-    <div class="kc"><div class="kc-bar" style="background:${hcol}"></div>
-      <div class="kc-lbl">LTV / CAC Ratio</div>
-      <div class="kc-val" style="color:${hcol}">${ratio.toFixed(2)}x</div>
-      <div class="kc-badges"><span class="bdg" style="background:${hbg};color:${hcol};border:1px solid ${hbd}">${health}</span></div>
-      <div class="kc-note">Target ≥ 3x${hasActualCAC?"":" · uses reference CAC"}</div></div>`;
-}
-
-/* ══════════════════════════════════════════════════════
-   CAVALI SUBSCRIBERS (Smartrr)
-══════════════════════════════════════════════════════ */
-function _renderSubCards(cards, source) {
-  const el = document.getElementById("s-subs"); if (!el) return;
-  el.innerHTML = cards.map(s => `
-    <div class="kc-sub">
-      <div class="kc-bar"></div>
-      <div class="kc-lbl" style="color:${s.c}">${s.l}</div>
-      <div class="kc-val" style="color:${s.c}">${s.v !== undefined ? s.v.toLocaleString() : "—"}</div>
-      <div class="kc-note">${source}</div>
-    </div>`).join('');
-}
-
-function renderSubsEmpty(reason) {
-  const el = document.getElementById("s-subs"); if (!el) return;
-  el.innerHTML = `
-    <div class="kc-sub">
-      <div class="kc-bar"></div>
-      <div class="kc-lbl" style="color:#D8B054">Smartrr</div>
-      <div class="kc-val" style="color:#D8B054">—</div>
-      <div class="kc-note">${reason || "Run pipeline to load active subscriptions"}</div>
-    </div>`;
-}
-
-async function renderSubs() {
-  if (brand !== "cavali") return;
-  const el = document.getElementById("s-subs"); if (!el) return;
-  const statusEl = document.getElementById("smartrr-status");
-  el.innerHTML = skel(4);
-  if (statusEl) statusEl.innerHTML = "";
-
-  const data = await fetchSmartrrSubs();
-  const ft = document.getElementById("ft-smartrr");
-
-  if (data === null) {
-    if (statusEl) statusEl.innerHTML = `<div class="smartrr-badge smartrr-warn">⚠ Smartrr data not loaded yet. Run pipeline.</div>`;
-    if (ft) { ft.textContent = "Smartrr"; ft.style.color = "var(--am)"; }
-    renderSubsEmpty("Missing smartrr_subscribers tab or empty Sheet row");
-    return;
-  }
-
-  if (!data.total) {
-    const msg = data.error || "Smartrr returned 0 active subscriptions";
-    if (statusEl) statusEl.innerHTML = `<div class="smartrr-badge smartrr-warn">⚠ ${msg}</div>`;
-    if (ft) { ft.textContent = "Smartrr"; ft.style.color = "var(--am)"; }
-    renderSubsEmpty(msg);
-    return;
-  }
-
-  const storeLabel = "cavaliclub.com";
-  if (statusEl) statusEl.innerHTML = `<div class="smartrr-badge smartrr-ok">✓ Smartrr · ${data.total} active subs · ${storeLabel}</div>`;
-  if (ft) { ft.textContent = "Smartrr ✓"; ft.style.color = "var(--gr)"; }
-
-  const cards = [
-    { l:"Seasonal",          v:data.sea, c:"#D8B054" },
-    { l:"Signature",         v:data.sig, c:"#A090FF" },
-    { l:"Premier",           v:data.pre, c:"#2EE896" },
-    { l:"Junior",            v:data.jun, c:"#F06868" },
-    ...(data.other > 0 ? [{ l:"Other", v:data.other, c:"#707070" }] : []),
-    { l:"Total Subscribers", v:data.total || (data.sea + data.sig + data.pre + data.jun + data.other), c:"#72AEFF" },
-  ];
-  _renderSubCards(cards, `${data.source || "Smartrr → Sheets"} · ${data.updated_at || "latest"}`);
-}
-
-/* ══════════════════════════════════════════════════════
-   Q1 2026 SNAPSHOT
-══════════════════════════════════════════════════════ */
-
-async function renderQ1(kpiRows) {
-  const el   = document.getElementById("q1-grid");
-  const note = document.getElementById("q1-note");
-  if (!el) return;
-  const Q1_PK = "q1_2026", Q1_S = "2026-01-01", Q1_E = "2026-03-31";
-  let row = null;
-  if (kpiRows?.length) {
-    let m = kpiRows.filter(r=>r.period===Q1_PK);
-    if (!m.length) m = kpiRows.filter(r=>(r.period_start||"").trim()===Q1_S&&(r.period_end||"").trim()===Q1_E);
-    row = bestRow(m);
-  }
-  const prevQ = kpiRows?.length ? bestRow(kpiRows.filter(r=>r.period==="q4_2025")) : null;
-  if (!row) {
-    el.innerHTML=`<div style="font-size:11px;color:var(--tx3);padding:6px 0">Q1 2026 data not found. Run <strong style="color:var(--gd)">Backfill Historical Data</strong> action then refresh.</div>`;
-    if (note) note.innerHTML = "";
-    return;
-  }
-  const gp = resolveGrossProfit(row);
-  const fields = [
-    {k:"gross_sales",  l:"Gross Sales Q1",  f:"$"},
-    {k:"net_sales",    l:"Net Sales Q1",    f:"$"},
-    {k:"gross_profit", l:"Gross Profit Q1", f:"$", gp:true},
-    {k:"pct_gm",       l:"Gross Margin",    f:"%"},
-    {k:"nb_orders",    l:"Orders Q1",       f:""},
-    {k:"aov",          l:"AOV Q1",          f:"$"},
-  ];
-  el.innerHTML = fields.map(s => {
-    const val    = s.gp ? fv(gp,"$") : fv(row[s.k],s.f);
-    const cmpVal = s.gp ? (prevQ ? resolveGrossProfit(prevQ) : null) : (prevQ ? prevQ[s.k] : null);
-    return kcard(s.l, val, prevQ?pctChg(s.gp?gp:row[s.k], cmpVal):null, "Q4 25", "", "var(--gd)");
-  }).join('');
-  if (note) note.innerHTML = `Q1 2026 = Jan 1 – Mar 31, 2026. Updated: <strong>${row.updated_at||"—"}</strong>. Compared vs Q4 2025.`;
-}
-
-/* ══════════════════════════════════════════════════════
-   MANUAL DATA
-══════════════════════════════════════════════════════ */
-function mKey() { return `${brand}_${getOpt().val||"default"}`; }
-
-function loadManual() {
-  try { const d=localStorage.getItem("el_manual"); if(d) manualData=JSON.parse(d); } catch(e){}
-  const m = manualData[mKey()]||{};
-  const setVal = (id, v) => { const el=document.getElementById(id); if(el) el.value=v||""; };
-  setVal("mi-spend",  m.spend||"");
-  setVal("mi-newcust",m.nc||"");
-  setVal("mi-ltv",    m.ltv||"");
-  setVal("mi-cac-ov", m.cacOv||"");
-  setVal("mi-ns",     m.ns||"");
-  setVal("mi-sea",    m.sea||"");
-  setVal("mi-sig",    m.sig||"");
-  setVal("mi-pre-sub",m.pre||"");
-  calcDerived();
-}
-
-function saveManual() {
-  manualData[mKey()] = {
-    spend: parseFloat(document.getElementById("mi-spend")?.value)||0,
-    nc:    parseInt(document.getElementById("mi-newcust")?.value)||0,
-    ltv:   parseFloat(document.getElementById("mi-ltv")?.value)||0,
-    cacOv: parseFloat(document.getElementById("mi-cac-ov")?.value)||0,
-    ns:    parseFloat(document.getElementById("mi-ns")?.value)||0,
-    sea:   parseInt(document.getElementById("mi-sea")?.value||0)||0,
-    sig:   parseInt(document.getElementById("mi-sig")?.value||0)||0,
-    pre:   parseInt(document.getElementById("mi-pre-sub")?.value||0)||0,
-  };
-  try { localStorage.setItem("el_manual", JSON.stringify(manualData)); } catch(e){}
-  const msg = document.getElementById("mi-msg");
-  if (msg) { msg.innerHTML = '<span class="saved-tag">✓ Saved</span>'; setTimeout(()=>msg.innerHTML="", 3000); }
-  render();
-}
-
-function clearManual() {
-  delete manualData[mKey()];
-  try { localStorage.setItem("el_manual", JSON.stringify(manualData)); } catch(e){}
-  ["mi-spend","mi-newcust","mi-ltv","mi-cac-ov","mi-ns","mi-sea","mi-sig","mi-pre-sub"].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value="";
-  });
-  calcDerived(); render();
-}
-
-function calcDerived() {
-  const spend = parseFloat(document.getElementById("mi-spend")?.value)||0;
-  const nc    = parseInt(document.getElementById("mi-newcust")?.value)||0;
-  const ltvIn = parseFloat(document.getElementById("mi-ltv")?.value)||0;
-  const ltv   = ltvIn > 0 ? ltvIn : DEFAULT_LTV_12M;
-  const cacOv = parseFloat(document.getElementById("mi-cac-ov")?.value)||0;
-  const nsOv  = parseFloat(document.getElementById("mi-ns")?.value)||0;
-  const roas  = nsOv>0&&spend>0 ? nsOv/spend : null;
-  const cacC  = nc>0&&spend>0   ? spend/nc   : null;
-  const cac   = cacOv>0 ? cacOv : cacC;
-  const ltvCac= cac&&ltv>0      ? ltv/cac    : null;
-  const dc = (l,v,f,c,n) => `<div class="kc"><div class="kc-bar" style="background:${c||'var(--gd)'}"></div><div class="kc-lbl">${l}</div><div class="kc-val">${v!==null&&v!==undefined&&!isNaN(v)?fv(v,f):"—"}</div><div class="kc-badges"></div>${n?`<div class="kc-note">${n}</div>`:""}</div>`;
-  const der = document.getElementById("mi-derived");
-  if (der) der.innerHTML =
-    dc("G+M Ad Spend",  spend>0?spend:null, "$", "var(--gd)") +
-    dc("G+M ROAS",      roas,               "x", "var(--gr)", "Net Sales ÷ G+M spend") +
-    dc("CAC (G+M)",     cac,                "$", "var(--gd)", nc>0?"G+M spend ÷ new customers":"Enter new customers") +
-    dc("LTV / CAC",     ltvCac,             "x", "var(--gd)", "LTV-12M ÷ CAC") +
-    dc("LTV-12M",       ltv>0?ltv:null,     "$", "var(--pu)");
-  renderCAC(cac||0, ltvIn, spend>0?"G+M":"");
-}
-
-/* ══════════════════════════════════════════════════════
-   HELPERS
-══════════════════════════════════════════════════════ */
-function safeSet(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
-function safeHTML(id, val) { const el=document.getElementById(id); if(el) el.innerHTML=val; }
-
-/* ══════════════════════════════════════════════════════
-   MAIN RENDER
-══════════════════════════════════════════════════════ */
-async function render() {
-  const opt = getOpt();
-  renderSelbar();
-
-  const root = document.getElementById("app-root");
-  if (root) root.classList.toggle("is-cavali", brand==="cavali");
-
-  safeSet("q1-num", brand==="cavali" ? "07" : "06");
-  safeSet("mi-num", brand==="cavali" ? "08" : "07");
-
-  const skelIds = { "s-web": 3, "s-fin": 9, "s-op": 4, "s-mkt": 4 };
-  Object.entries(skelIds).forEach(([id, n]) => safeHTML(id, skel(n)));
-
-  const ovEl  = document.getElementById("ov");
-  const ovLbl = document.getElementById("ov-lbl");
-  if (ovLbl) ovLbl.textContent = `Loading ${brand==="corro"?"Corro":"Cavali"}...`;
-  if (ovEl) ovEl.classList.add("show");
-
-  const sid = SIDS[brand];
-  const [kpiR, rsR, nvrR, adR] = await Promise.all([
-    fetchTab(sid, "kpis_daily"),
-    fetchTab(sid, "revenue_share"),
-    fetchTab(sid, "new_vs_returning"),
-    fetchTab(sid, "ad_spend"),
-  ]);
-
-  const row              = findRow(kpiR, opt);
-  const { row:cmpRow, lbl:cmpLbl } = findCmp(kpiR, opt);
-  const cmpShort         = selCmp==="yoy"?"YOY":selCmp==="prev"?"PREV":"—";
-
-  // Website
-  safeHTML("s-web", DEFS.web.map(s => {
-    const val = row ? fv(row[s.k], s.f) : "—";
-    const pct = row&&cmpRow ? pctChg(row[s.k], cmpRow[s.k]) : null;
-    return kcard(s.l, val, pct, cmpShort, s.n||"", undefined, false);
-  }).join(''));
-
-  // Financial
-  safeHTML("s-fin", DEFS.fin.map(s => {
-    let val, pct;
-    if (s.k === "gross_profit") {
-      const gpCur = row ? resolveGrossProfit(row) : null;
-      const gpCmp = cmpRow ? resolveGrossProfit(cmpRow) : null;
-      val = fv(gpCur, s.f);
-      pct = (gpCur !== null && gpCmp !== null) ? pctChg(gpCur, gpCmp) : null;
-    } else {
-      val = row ? fv(row[s.k], s.f) : "—";
-      pct = row&&cmpRow ? pctChg(row[s.k], cmpRow[s.k]) : null;
-    }
-    return kcard(s.l, val, pct, cmpShort, s.n||"", undefined, s.inv||false);
-  }).join(''));
-
-  // Operational
-  safeHTML("s-op", DEFS.op.map(s => {
-    const val = row ? fv(row[s.k], s.f) : "—";
-    const pct = row&&cmpRow ? pctChg(row[s.k], cmpRow[s.k]) : null;
-    return kcard(s.l, val, pct, cmpShort, s.n||"", undefined, false);
-  }).join(''));
-
-  // FCS
-  renderFCS(row);
-
-  // Revenue Share
-  renderRS(rsR, row);
-
-  // New vs Returning
-  renderNVR(nvrR, row);
-
-  // Marketing KPIs
-  const mo   = (opt.start||"").slice(0,7);
-  const adF  = (adR||[]).filter(r => {
-    if (r.brand && r.brand!==brand) return false;
-    const p = (r.period||"").trim();
-    if (ptype==="mtd"||ptype==="month"||ptype==="week") return p===mo;
-    if (ptype==="quarter") {
-      if (!p||p.length!==7) return false;
-      try {
-        const pm=new Date(p+"-01T12:00"), qs=new Date((opt.start||"")+"T12:00"), qe=new Date((opt.end||"")+"T12:00");
-        return pm>=qs && pm<=qe;
-      } catch(e) { return false; }
-    }
-    return false;
-  });
-
-  const sheetSpend = adF.reduce((a,r)=>a+parseFloat(r.ad_spend||0),0);
-  const sheetRoas  = adF.length===1 ? parseFloat(adF[0].roas||0) : 0;
-  const cacAuto    = adF.length===1 && adF[0].cac_auto && adF[0].cac_auto!=="" ? parseFloat(adF[0].cac_auto) : null;
-
-  const m = manualData[mKey()]||{};
-  const hasManualSpend = (m.spend||0) > 0;
-  const activeSpend    = hasManualSpend ? m.spend : sheetSpend;
-  const nsVal          = (m.ns||0) > 0 ? m.ns : (row ? parseFloat(row.net_sales||0) : 0);
-  const nbVal          = row ? parseFloat(row.nb_orders||0) : 0;
-  const newCustRow     = row ? parseFloat(row.new_customers||0) : 0;
-
-  let roasV, roasSrc;
-  if (hasManualSpend && nsVal)             { roasV=nsVal/m.spend;      roasSrc="Google+Meta"; }
-  else if (sheetRoas>0&&ptype!=="quarter") { roasV=sheetRoas;          roasSrc="Shopify (attributed)"; }
-  else if (activeSpend&&nsVal)             { roasV=nsVal/activeSpend;  roasSrc=hasManualSpend?"G+M":"Shopify (calc)"; }
-  else                                     { roasV=null;               roasSrc="—"; }
-
-  const cacOv   = (m.cacOv||0) > 0 ? m.cacOv : null;
-  const ncManual= (m.nc||0)    > 0 ? m.nc    : null;
-  const ncReal  = ncManual || (newCustRow>0 ? newCustRow : null);
-  const cacCalc = hasManualSpend && ncReal ? m.spend/ncReal : null;
-  const cacV    = cacOv || cacCalc || cacAuto || (activeSpend&&nbVal ? activeSpend/nbVal : null);
-  const cacDisplay = cacV || DEFAULT_CAC_REF;
-  const cacSrc  = cacOv?"override" : cacCalc?"G+M ÷ new_customers" : cacAuto?"pipeline v4 auto" : (cacV?"Shopify (approx)":"Reference fallback (~$47)");
-  const cacIsApprox = !cacOv && !cacCalc && !cacAuto;
-
-  const ltvV = (m.ltv||0) > 0 ? m.ltv : DEFAULT_LTV_12M;
-
-  const ftManual = document.getElementById("ft-manual");
-  if (ftManual) ftManual.style.display = hasManualSpend ? "" : "none";
-  const ftRoas = document.getElementById("ft-roas");
-  if (ftRoas) {
-    if (hasManualSpend) { ftRoas.textContent="ROAS: G+M ✓"; ftRoas.style.color="var(--gr)"; }
-    else               { ftRoas.textContent="ROAS: Shopify ⚠"; ftRoas.style.color="var(--am)"; }
-  }
-  const roasWarn = document.getElementById("roas-warn");
-  if (roasWarn) roasWarn.classList.toggle("show", !hasManualSpend);
-  safeSet("mkt-lbl", hasManualSpend ? "Marketing KPIs — Google+Meta spend" : "Marketing KPIs — Shopify ad spend (⚠ attributed)");
-
-  safeHTML("s-mkt", [
-    { l:"Ad Spend",                           v:activeSpend?fv(activeSpend,"$"):"—", note:hasManualSpend?"Google+Meta (manual)":"Sheets total — enter G+M ↓", warn:!hasManualSpend },
-    { l:hasManualSpend?"ROAS (G+M)":"ROAS",   v:roasV?fv(roasV,"x"):"—",            note:roasSrc, warn:!hasManualSpend&&roasV!==null },
-    { l:"CAC",                                v:fv(cacDisplay,"$"),                  note:cacSrc, warn:cacIsApprox },
-    { l:"LTV / CAC",                          v:fv(ltvV/cacDisplay,"x"),             note:`LTV $${ltvV} ÷ CAC`, warn:!cacV },
-  ].map(({l,v,note,warn})=> warn?kcardAmber(l,v,"⚠",note):kcard(l,v,null,null,note,"var(--gd)")).join(''));
-
-  renderCAC(cacV||0, (m.ltv||0), cacSrc);
-
-  if (brand==="cavali") await renderSubs();
-
-  await renderQ1(kpiR);
-
-  renderIbar(opt, cmpLbl);
-  loadManual();
-
-  if (row) {
-    const upd = row.updated_at||"";
-    safeSet("foot-txt", `Last updated: ${upd} · Shopify → Sheets → Dashboard`);
-    safeSet("sb-upd", upd.slice(0,10)||"Today");
-  }
-
-  if (ovEl) ovEl.classList.remove("show");
-}
-
-/* ══════════════════════════════════════════════════════
-   UI CONTROLS
-══════════════════════════════════════════════════════ */
-function togglePanel(id) { const el=document.getElementById(id); if(el) el.classList.toggle("open"); }
-function forceRefresh() {
-  cache = {}; _smartrrCache = null; _smartrrTs = 0;
-  const btn = document.querySelector(".rf-btn");
-  if (btn) btn.style.opacity = ".5";
-  render().then(()=>{ if(btn) btn.style.opacity="1"; });
-}
-function setBrand(b) {
-  brand = b;
-  document.querySelectorAll(".brand-btn").forEach(el=>el.classList.toggle("on",el.textContent.trim().toLowerCase()===b));
-  safeSet("ph-title", (b==="corro"?"Corro":"Cavali")+" — Performance");
-  cache = {}; _smartrrCache = null; _smartrrTs = 0; render();
-}
-function setPT(p, el) {
-  ptype = p;
-  document.querySelectorAll(".period-btn").forEach(x=>x.classList.remove("on"));
-  if (el) el.classList.add("on");
-  cache = {}; render();
-}
-function toggleTheme() {
-  const h=document.documentElement, dk=h.getAttribute("data-theme")==="dark";
-  h.setAttribute("data-theme", dk?"light":"dark");
-  const btn = document.getElementById("theme-btn");
-  if (btn) btn.textContent = dk?"☀":"☾";
-}
-
-setInterval(()=>{ cache={}; render(); }, 5*60*1000);
-renderSelbar();
-render();
-</script>
-</body>
-</html>
+"""
+FREQUENCY PIPELINE v1 — Equestrian Labs / Corro
+================================================
+Responde exactamente lo que pidio Ceci en la reunion:
+
+  "Todos mis clientes del 2025, cuantos han comprado UNA vez,
+   DOS veces, TRES O MAS veces?"
+
+  "De los que compraron en Q1 2025, cuantos volvieron a comprar
+   en los 12 meses siguientes?"
+
+  "El total tiene que cuadrar con 400-600 activos por mes, no 57."
+  FIX: el error anterior filtraba solo clientes nuevos. Aqui se toman
+  TODOS los que compraron en el periodo (nuevos + recurrentes).
+
+Tabs que escribe:
+  freq_distribution  cuantos clientes: 1x / 2x / 3x+ y su revenue
+  freq_monthly       clientes activos por mes (debe dar ~400-600)
+  freq_segments      Ecom vs Concierge: frecuencia y lealtad
+  freq_cohort        retencion: de los de Q1, cuantos volvieron?
+
+Run:
+  python frequency_v1.py --year 2025
+  python frequency_v1.py --year 2025 --skip-cohort   (rapido, ~5 min)
+  python frequency_v1.py --year 2026
+
+Secrets requeridos en GitHub Actions:
+  SHOPIFY_TOKEN_CORRO   GOOGLE_CREDENTIALS   SHEET_ID_FREQ
+"""
+
+import os
+import json
+import time
+import requests
+import gspread
+import argparse
+import calendar
+from google.oauth2.service_account import Credentials
+from datetime import datetime, timedelta, date
+from collections import defaultdict
+import pytz
+
+# ── CONFIG ────────────────────────────────────────────────────────
+TIMEZONE    = pytz.timezone("America/Bogota")
+API_VERSION = "2024-10"
+STORE_URL   = os.environ.get("SHOPIFY_STORE", "equestrian-labs.myshopify.com")
+TOKEN       = os.environ.get("SHOPIFY_TOKEN_CORRO", "")
+SHEET_ID    = os.environ.get("SHEET_ID_FREQ", "")
+SCOPES      = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+
+# ── SHOPIFY REST — con retry completo en 429 y 5xx ───────────────
+def shopify_get(endpoint, params=None):
+    """
+    Paginacion automatica + retry robusto:
+    - 429: espera Retry-After header
+    - 5xx (502, 503, 504...): espera y reintenta la MISMA pagina
+    - Network errors: espera y reintenta la MISMA pagina
+    El current_url se preserva entre reintentos para no perder paginacion.
+    """
+    if params is None:
+        params = {}
+    start_url      = f"https://{STORE_URL}/admin/api/{API_VERSION}/{endpoint}"
+    headers        = {"X-Shopify-Access-Token": TOKEN}
+    results        = []
+    current_url    = start_url
+    current_params = params
+
+    while current_url:
+        last_error = None
+        response   = None
+
+        for attempt in range(8):
+            try:
+                response = requests.get(
+                    current_url,
+                    headers=headers,
+                    params=current_params,
+                    timeout=60,
+                )
+            except (requests.exceptions.ConnectionError,
+                    requests.exceptions.Timeout) as e:
+                last_error = e
+                wait = min(10 * (attempt + 1), 60)
+                print(f"    network error (attempt {attempt+1}/8), retry in {wait}s: {e}")
+                time.sleep(wait)
+                continue
+
+            if response.status_code == 429:
+                try:
+                    wait = int(response.headers.get("Retry-After", "") or 2)
+                except ValueError:
+                    wait = 2 ** attempt
+                wait = max(wait, 1)
+                print(f"    rate-limited — waiting {wait}s (attempt {attempt+1}/8)...")
+                time.sleep(wait)
+                continue
+
+            if response.status_code >= 500:
+                wait = min(10 * (attempt + 1), 90)
+                print(f"    Shopify {response.status_code} (attempt {attempt+1}/8), retry in {wait}s...")
+                time.sleep(wait)
+                continue
+
+            response.raise_for_status()
+            break
+
+        else:
+            if last_error:
+                raise RuntimeError(
+                    f"shopify_get failed after 8 attempts on {endpoint}: {last_error}"
+                )
+            if response is not None:
+                response.raise_for_status()
+            raise RuntimeError(f"shopify_get failed after 8 attempts on {endpoint}")
+
+        try:
+            data = response.json()
+        except ValueError as e:
+            raise RuntimeError(f"Invalid JSON from Shopify ({endpoint}): {e}")
+
+        data_keys = [k for k in data if k != "errors"]
+        if not data_keys:
+            break
+        key   = data_keys[0]
+        batch = data.get(key, [])
+        if isinstance(batch, list):
+            results.extend(batch)
+
+        link           = response.headers.get("Link", "")
+        current_url    = None
+        current_params = {}
+        if 'rel="next"' in link:
+            for part in link.split(","):
+                if 'rel="next"' in part:
+                    current_url = part.split(";")[0].strip().strip("<>")
+
+        time.sleep(0.35)
+
+    return results
+
+# ── FETCH ORDERS ──────────────────────────────────────────────────
+def fetch_orders(start, end):
+    """
+    Jala TODAS las ordenes pagadas del rango de fechas.
+    Incluye nuevos Y recurrentes — este era el bug que daba 57 en lugar de 500+.
+    """
+    print(f"  Fetching orders {start} to {end}...")
+    orders = shopify_get("orders.json", {
+        "status":           "any",
+        "financial_status": "paid,partially_paid,partially_refunded,refunded",
+        "created_at_min":   f"{start}T00:00:00-05:00",
+        "created_at_max":   f"{end}T23:59:59-05:00",
+        "limit":            250,
+        "fields":           "id,created_at,subtotal_price,source_name,tags,customer",
+    })
+    print(f"  -> {len(orders)} orders retrieved")
+    return orders
+
+def fetch_customer_order_history(customer_ids):
+    """
+    Para el analisis de cohorte: jala el historial completo de cada cliente
+    para saber si volvio a comprar despues de su primer trimestre.
+
+    En lugar de una llamada por cliente (muy lento y rate-limit),
+    jalamos TODAS las ordenes desde 2024 y las agrupamos por cliente_id.
+    Mucho mas eficiente: ~10-20 llamadas en lugar de 1500+.
+    """
+    print("  Fetching full order history for cohort analysis...")
+    print("  (pulling all orders since 2024-01-01 — much faster than per-customer calls)")
+
+    # Fetch all orders from 2024 onwards in one paginated sweep
+    all_orders = shopify_get("orders.json", {
+        "status":           "any",
+        "financial_status": "paid,partially_paid,partially_refunded,refunded",
+        "created_at_min":   "2024-01-01T00:00:00-05:00",
+        "limit":            250,
+        "fields":           "id,created_at,customer",
+    })
+    print(f"  -> {len(all_orders)} total orders loaded for history")
+
+    cid_set = set(str(c) for c in customer_ids)
+    history = defaultdict(list)
+    for o in all_orders:
+        c   = o.get("customer") or {}
+        cid = str(c.get("id", ""))
+        if not cid or cid not in cid_set:
+            continue
+        d = o.get("created_at", "")[:10]
+        if d:
+            history[cid].append(d)
+
+    for cid in history:
+        history[cid].sort()
+
+    return history
+
+# ── CHANNEL DETECTION ─────────────────────────────────────────────
+# Confirmado del tag audit Q4 2025 (326 ordenes Concierge):
+# 'concierge, LH' | 'Concierge, DG' | 'Concierge, JS' | 'Concierge, JW'
+def detect_channel(order):
+    src  = (order.get("source_name") or "").lower().strip()
+    tags = (order.get("tags") or "").lower()
+    if "concierge" in tags or "concierge" in src:
+        return "Concierge"
+    if src == "pos" or "wellington" in tags:
+        return "Wellington (POS)"
+    return "Online (Ecom)"
+
+# ── TAB 1: DISTRIBUCION DE FRECUENCIA ────────────────────────────
+def build_distribution(orders, year_label, now_str):
+    """
+    La tabla principal que pidio Ceci:
+    - Cuantos clientes compraron 1 vez, 2 veces, 3 o mas veces
+    - Revenue que trajo cada grupo
+    - AOV por grupo
+    El total de clientes debe cuadrar con lo que se ve en Shopify.
+    """
+    # Agrupar ordenes por cliente
+    cust_orders  = defaultdict(list)   # cid -> [fecha, ...]
+    cust_revenue = defaultdict(float)  # cid -> total revenue
+
+    for o in orders:
+        c   = o.get("customer") or {}
+        cid = str(c.get("id") or f"guest_{o.get('id','')}")
+        d   = (o.get("created_at") or "")[:10]
+        rev = float(o.get("subtotal_price") or 0)
+        if d:
+            cust_orders[cid].append(d)
+        cust_revenue[cid] += rev
+
+    # Buckets de frecuencia
+    BUCKETS = ["1x — bought once", "2x — bought twice", "3x+ — loyal buyers"]
+    data = {b: {"customers": 0, "net_sales": 0.0, "orders": 0} for b in BUCKETS}
+
+    for cid, order_list in cust_orders.items():
+        n = len(order_list)
+        if n == 1:
+            bucket = "1x — bought once"
+        elif n == 2:
+            bucket = "2x — bought twice"
+        else:
+            bucket = "3x+ — loyal buyers"
+        data[bucket]["customers"] += 1
+        data[bucket]["net_sales"] += cust_revenue[cid]
+        data[bucket]["orders"]    += n
+
+    total_cust = sum(d["customers"] for d in data.values()) or 1
+    total_rev  = sum(d["net_sales"]  for d in data.values()) or 1
+    total_ord  = sum(d["orders"]     for d in data.values()) or 1
+    avg_freq   = round(total_ord / total_cust, 2)
+
+    print(f"\n  ── FREQUENCY DISTRIBUTION ({year_label}) ──────────────────")
+    print(f"  Total unique customers : {total_cust}")
+    print(f"  Total orders           : {total_ord}")
+    print(f"  Avg orders/customer    : {avg_freq}  (Ceci mentioned ~2.8)")
+    for b in BUCKETS:
+        d = data[b]
+        pct_c = round(d["customers"] / total_cust * 100, 1)
+        pct_r = round(d["net_sales"]  / total_rev  * 100, 1)
+        print(f"    {b}: {d['customers']} customers ({pct_c}%) -> ${d['net_sales']:,.0f} ({pct_r}%)")
+    print(f"  ──────────────────────────────────────────────────────────\n")
+
+    rows = []
+    for b in BUCKETS:
+        d = data[b]
+        aov = round(d["net_sales"] / d["orders"], 2) if d["orders"] else 0
+        rows.append([
+            now_str, year_label, b,
+            d["customers"],
+            round(d["customers"] / total_cust * 100, 1),
+            round(d["net_sales"], 2),
+            round(d["net_sales"] / total_rev * 100, 1),
+            d["orders"],
+            aov,
+        ])
+
+    return rows, total_cust, total_ord
+
+# ── TAB 2: CLIENTES ACTIVOS POR MES ──────────────────────────────
+def build_monthly(orders, year, now_str):
+    """
+    Clientes activos por mes — debe cuadrar con ~400-600 que ve Ceci
+    en Shopify Analytics. Si da 57 algo esta mal filtrado.
+    Aqui NO filtramos solo nuevos — contamos TODOS los que compraron ese mes.
+    """
+    monthly = {}
+    first_seen_in_year = {}  # cid -> primer mes en que aparece en estos datos
+
+    for o in sorted(orders, key=lambda x: x.get("created_at") or ""):
+        c   = o.get("customer") or {}
+        cid = str(c.get("id") or f"guest_{o.get('id','')}")
+        d   = (o.get("created_at") or "")[:10]
+        if not d or len(d) < 7:
+            continue
+        mo  = d[:7]  # "2025-01"
+        rev = float(o.get("subtotal_price") or 0)
+
+        if mo not in monthly:
+            monthly[mo] = {
+                "all_customers":       set(),
+                "new_to_year":         set(),
+                "returning_in_year":   set(),
+                "orders":              0,
+                "net_sales":           0.0,
+            }
+
+        monthly[mo]["all_customers"].add(cid)
+        monthly[mo]["orders"]    += 1
+        monthly[mo]["net_sales"] += rev
+
+        if cid not in first_seen_in_year:
+            first_seen_in_year[cid] = mo
+            monthly[mo]["new_to_year"].add(cid)
+        else:
+            monthly[mo]["returning_in_year"].add(cid)
+
+    rows = []
+    for mo in sorted(monthly.keys()):
+        m = monthly[mo]
+        total  = len(m["all_customers"])
+        new_c  = len(m["new_to_year"])
+        ret_c  = len(m["returning_in_year"])
+        orders = m["orders"]
+        rev    = m["net_sales"]
+        rows.append([
+            now_str, str(year), mo,
+            total, new_c, ret_c,
+            orders,
+            round(rev, 2),
+            round(orders / total, 2) if total else 0,
+            round(rev    / total, 2) if total else 0,
+        ])
+        print(f"  {mo}: {total:>4} active  ({new_c:>4} new + {ret_c:>4} returning) | ${rev:>10,.0f}")
+
+    return rows
+
+# ── TAB 3: FRECUENCIA POR CANAL ───────────────────────────────────
+def build_by_channel(orders, year_label, now_str):
+    """
+    Ecom vs Concierge vs Wellington:
+    - Cual canal tiene clientes mas leales (compran mas veces)?
+    - Cual trae mas revenue por cliente?
+    Ceci quiere saber si Concierge tiene mejor retencion que Ecom.
+    """
+    # Construir mapa cid -> {channel, orders, revenue}
+    cust_by_channel = defaultdict(lambda: defaultdict(lambda: {
+        "order_dates": [],
+        "revenue": 0.0,
+    }))
+
+    for o in orders:
+        c   = o.get("customer") or {}
+        cid = str(c.get("id") or f"guest_{o.get('id','')}")
+        ch  = detect_channel(o)
+        d   = (o.get("created_at") or "")[:10]
+        rev = float(o.get("subtotal_price") or 0)
+        if d:
+            cust_by_channel[ch][cid]["order_dates"].append(d)
+        cust_by_channel[ch][cid]["revenue"] += rev
+
+    rows = []
+    print(f"\n  ── BY CHANNEL ({year_label}) ─────────────────────────────────")
+
+    for ch in sorted(cust_by_channel.keys()):
+        cust_map = cust_by_channel[ch]
+        freq_buckets = {"1x": 0, "2x": 0, "3x+": 0}
+        rev_buckets  = {"1x": 0.0, "2x": 0.0, "3x+": 0.0}
+        total_cust   = len(cust_map)
+        total_orders = 0
+        total_rev    = 0.0
+
+        for cid, info in cust_map.items():
+            n = len(info["order_dates"])
+            total_orders += n
+            total_rev    += info["revenue"]
+            k = "1x" if n == 1 else ("2x" if n == 2 else "3x+")
+            freq_buckets[k] += 1
+            rev_buckets[k]  += info["revenue"]
+
+        avg_freq = round(total_orders / total_cust, 2) if total_cust else 0
+        avg_rev  = round(total_rev    / total_cust, 2) if total_cust else 0
+
+        print(f"  {ch}: {total_cust} customers | avg {avg_freq} orders | "
+              f"1x:{freq_buckets['1x']}  2x:{freq_buckets['2x']}  3x+:{freq_buckets['3x+']}")
+
+        for freq_label in ["1x", "2x", "3x+"]:
+            cnt = freq_buckets[freq_label]
+            rows.append([
+                now_str, year_label, ch, freq_label,
+                cnt,
+                round(cnt / total_cust * 100, 1) if total_cust else 0,
+                round(rev_buckets[freq_label], 2),
+                total_cust, total_orders, avg_freq, avg_rev,
+            ])
+
+    print(f"  ─────────────────────────────────────────────────────────\n")
+    return rows
+
+# ── TAB 4: COHORTE DE RETENCION ───────────────────────────────────
+def build_cohort(orders, year, now_str, history):
+    """
+    La pregunta clave de Ceci:
+    "De los clientes que compraron en Q1 2025, cuantos volvieron
+    a comprar en los siguientes 3, 6 y 12 meses?"
+
+    Logica:
+    1. Para cada trimestre, identificar los clientes que compraron ESE trimestre
+    2. Ver si en su historial total tienen ordenes DESPUES del trimestre
+    3. Calcular tasa de retencion a 3m / 6m / 12m
+    """
+    # Primer orden de cada cliente dentro del ano analizado
+    cust_first_in_year = {}
+    for o in orders:
+        c   = o.get("customer") or {}
+        cid = str(c.get("id") or "")
+        if not cid or cid.startswith("guest_"):
+            continue
+        d = (o.get("created_at") or "")[:10]
+        if not d:
+            continue
+        if cid not in cust_first_in_year or d < cust_first_in_year[cid]:
+            cust_first_in_year[cid] = d
+
+    # Agrupar por trimestre de primera compra en el ano
+    quarters = {f"Q{q}_{year}": [] for q in range(1, 5)}
+    for cid, first_d in cust_first_in_year.items():
+        try:
+            mo = int(first_d[5:7])
+        except (ValueError, IndexError):
+            continue
+        q  = (mo - 1) // 3 + 1
+        qk = f"Q{q}_{year}"
+        if qk in quarters:
+            quarters[qk].append(cid)
+
+    rows = []
+    print(f"\n  ── COHORT RETENTION ({year}) ────────────────────────────────")
+
+    for q_num in range(1, 5):
+        qk       = f"Q{q_num}_{year}"
+        cohort   = quarters[qk]
+        q_start  = date(year, (q_num - 1) * 3 + 1, 1)
+        q_end_m  = q_num * 3
+        q_end    = date(year, q_end_m, calendar.monthrange(year, q_end_m)[1])
+
+        returned_3m  = 0
+        returned_6m  = 0
+        returned_12m = 0
+        total = len(cohort)
+
+        for cid in cohort:
+            past_orders = history.get(cid, [])
+            # Solo contar ordenes DESPUES del fin del trimestre
+            future_dates = [d for d in past_orders if d > str(q_end)]
+            if not future_dates:
+                continue
+            earliest = min(future_dates)
+            try:
+                ret_date     = date.fromisoformat(earliest)
+                days_elapsed = (ret_date - q_end).days
+            except ValueError:
+                continue
+
+            if days_elapsed <= 90:
+                returned_3m  += 1
+            if days_elapsed <= 180:
+                returned_6m  += 1
+            if days_elapsed <= 365:
+                returned_12m += 1
+
+        rate_3m  = round(returned_3m  / total * 100, 1) if total else 0
+        rate_6m  = round(returned_6m  / total * 100, 1) if total else 0
+        rate_12m = round(returned_12m / total * 100, 1) if total else 0
+
+        print(f"  {qk}: {total:>4} customers | "
+              f"3m: {returned_3m:>4} ({rate_3m}%)  "
+              f"6m: {returned_6m:>4} ({rate_6m}%)  "
+              f"12m: {returned_12m:>4} ({rate_12m}%)")
+
+        rows.append([
+            now_str, str(year), qk,
+            str(q_start), str(q_end),
+            total,
+            returned_3m,  returned_6m,  returned_12m,
+            rate_3m,      rate_6m,      rate_12m,
+        ])
+
+    print(f"  ─────────────────────────────────────────────────────────\n")
+    return rows
+
+# ── GOOGLE SHEETS ─────────────────────────────────────────────────
+def get_gc():
+    raw = os.environ.get("GOOGLE_CREDENTIALS", "")
+    if not raw:
+        raise RuntimeError("GOOGLE_CREDENTIALS env var is missing")
+    creds = Credentials.from_service_account_info(json.loads(raw), scopes=SCOPES)
+    return gspread.authorize(creds)
+
+def sheets_call(fn, *args, **kwargs):
+    """Retry automatico en 429/500 de Google Sheets API."""
+    for attempt in range(8):
+        try:
+            return fn(*args, **kwargs)
+        except gspread.exceptions.APIError as e:
+            status = e.response.status_code if hasattr(e, "response") else 0
+            if status == 429 or status >= 500:
+                wait = min(15 * (attempt + 1), 90)
+                print(f"    Sheets API {status} — waiting {wait}s (attempt {attempt+1})...")
+                time.sleep(wait)
+                continue
+            raise
+        except Exception as e:
+            if attempt < 3:
+                print(f"    Sheets error, retrying: {e}")
+                time.sleep(10)
+                continue
+            raise
+    raise RuntimeError("Sheets call failed after 8 attempts")
+
+def upsert_tab(sh, tab_name, headers, new_rows, key_cols):
+    """
+    Upsert con retry automatico en 429, batches de 500 filas,
+    y pausa entre tabs para no superar 60 writes/min de Sheets API.
+    """
+    BATCH_SIZE  = 500
+    SLEEP_BATCH = 2.0
+    SLEEP_TAB   = 5.0
+
+    try:
+        ws = sh.worksheet(tab_name)
+    except gspread.exceptions.WorksheetNotFound:
+        ws = sheets_call(sh.add_worksheet, tab_name,
+                         rows=max(3000, len(new_rows) + 100),
+                         cols=len(headers) + 2)
+        time.sleep(2)
+
+    existing = {}
+    try:
+        vals = sheets_call(ws.get_all_values)
+        if len(vals) >= 2:
+            ex_h = vals[0]
+            for r in vals[1:]:
+                m = {ex_h[i]: (r[i] if i < len(r) else "") for i in range(len(ex_h))}
+                k = tuple(str(m.get(c, "")).strip() for c in key_cols)
+                if any(k):
+                    existing[k] = [m.get(h, "") for h in headers]
+    except Exception as e:
+        print(f"    Warning reading {tab_name}: {e}")
+
+    for row in new_rows:
+        m = {headers[i]: (row[i] if i < len(row) else "") for i in range(len(headers))}
+        k = tuple(str(m.get(c, "")).strip() for c in key_cols)
+        existing[k] = row
+
+    merged = sorted(existing.values(), key=lambda r: str(r[1]) if len(r) > 1 else "")
+
+    all_data = [headers]
+    for r in merged:
+        clean = []
+        for v in r:
+            if v is None:
+                clean.append("")
+            elif isinstance(v, float) and v != v:  # NaN
+                clean.append("")
+            elif hasattr(v, 'strftime'):  # date/datetime -> string
+                clean.append(v.strftime("%Y-%m-%d"))
+            elif isinstance(v, (int, float, bool)):
+                clean.append(v)
+            else:
+                clean.append(str(v))
+        all_data.append(clean)
+
+    if len(all_data) > ws.row_count or len(headers) > ws.col_count:
+        sheets_call(ws.resize, rows=len(all_data) + 50, cols=len(headers) + 2)
+        time.sleep(1)
+
+    sheets_call(ws.clear)
+    time.sleep(1)
+
+    written = 0
+    for i in range(0, len(all_data), BATCH_SIZE):
+        batch = all_data[i:i + BATCH_SIZE]
+        sheets_call(ws.append_rows, batch, value_input_option="RAW",
+                    insert_data_option="INSERT_ROWS")
+        written += len(batch)
+        if i + BATCH_SIZE < len(all_data):
+            time.sleep(SLEEP_BATCH)
+
+    time.sleep(SLEEP_TAB)
+    print(f"    ok {tab_name}: {len(new_rows)} new rows, {len(merged)} total")
+
+# ── MAIN ──────────────────────────────────────────────────────────
+def main():
+    parser = argparse.ArgumentParser(description="Frequency analysis pipeline")
+    parser.add_argument("--year", type=int, default=2025,
+                        help="Year to analyze (default: 2025)")
+    parser.add_argument("--skip-cohort", action="store_true",
+                        help="Skip cohort tab — faster run, no extra API calls")
+    args = parser.parse_args()
+
+    year    = args.year
+    today   = datetime.now(TIMEZONE).date()
+    start   = date(year, 1, 1)
+    end     = date(year, 12, 31) if year < today.year else today
+    label   = f"full_year_{year}"
+    now_str = datetime.now(TIMEZONE).strftime("%Y-%m-%d %H:%M")
+
+    if not TOKEN:
+        raise RuntimeError("SHOPIFY_TOKEN_CORRO env var is missing")
+    if not SHEET_ID:
+        raise RuntimeError("SHEET_ID_FREQ env var is missing")
+
+    print(f"\n{'='*60}")
+    print(f"  FREQUENCY PIPELINE — Corro")
+    print(f"  Store : {STORE_URL}")
+    print(f"  Year  : {year}  ({start} to {end})")
+    print(f"  Sheet : {SHEET_ID}")
+    print(f"{'='*60}\n")
+
+    # ── Fetch orders ──────────────────────────────────────────────
+    orders = fetch_orders(start, end)
+    if not orders:
+        print("  No orders found for this period. Check token and dates.")
+        return
+
+    # ── Connect to Sheets ─────────────────────────────────────────
+    gc = get_gc()
+    sh = gc.open_by_key(SHEET_ID)
+
+    # ── TAB 1: Frequency distribution ────────────────────────────
+    print("  Building frequency distribution...")
+    dist_rows, total_cust, total_ord = build_distribution(orders, label, now_str)
+    upsert_tab(sh, "freq_distribution",
+        headers=["updated_at","period","frequency_bucket",
+                 "customers","pct_customers",
+                 "net_sales","pct_revenue",
+                 "orders","avg_order_value"],
+        new_rows=dist_rows,
+        key_cols=["period","frequency_bucket"])
+
+    # ── TAB 2: Monthly active customers ──────────────────────────
+    print("  Building monthly active customers...")
+    monthly_rows = build_monthly(orders, year, now_str)
+    upsert_tab(sh, "freq_monthly",
+        headers=["updated_at","year","month",
+                 "total_active_customers","new_customers","returning_customers",
+                 "total_orders","net_sales",
+                 "avg_orders_per_customer","avg_revenue_per_customer"],
+        new_rows=monthly_rows,
+        key_cols=["year","month"])
+
+    # ── TAB 3: By channel ─────────────────────────────────────────
+    print("  Building frequency by channel...")
+    ch_rows = build_by_channel(orders, label, now_str)
+    upsert_tab(sh, "freq_segments",
+        headers=["updated_at","period","channel","frequency_bucket",
+                 "customers","pct_of_channel","net_sales",
+                 "total_channel_customers","total_channel_orders",
+                 "avg_freq","avg_revenue_per_customer"],
+        new_rows=ch_rows,
+        key_cols=["period","channel","frequency_bucket"])
+
+    # ── TAB 4: Cohort retention ───────────────────────────────────
+    if not args.skip_cohort:
+        print("  Building cohort retention...")
+        # Collect all real customer IDs from the year's orders
+        real_cids = list({
+            str(o.get("customer", {}).get("id", ""))
+            for o in orders
+            if o.get("customer", {}).get("id")
+        })
+        history = fetch_customer_order_history(real_cids)
+        cohort_rows = build_cohort(orders, year, now_str, history)
+        upsert_tab(sh, "freq_cohort",
+            headers=["updated_at","year","cohort","cohort_start","cohort_end",
+                     "total_customers",
+                     "returned_3m","returned_6m","returned_12m",
+                     "retention_rate_3m","retention_rate_6m","retention_rate_12m"],
+            new_rows=cohort_rows,
+            key_cols=["year","cohort"])
+    else:
+        print("  Skipping cohort (--skip-cohort flag set)")
+
+    # ── Summary ───────────────────────────────────────────────────
+    avg_freq = round(total_ord / total_cust, 2) if total_cust else 0
+    print(f"\n{'='*60}")
+    print(f"  DONE — Year {year}")
+    print(f"  Unique customers : {total_cust}")
+    print(f"  Total orders     : {total_ord}")
+    print(f"  Avg freq/customer: {avg_freq}  (Ceci mentioned ~2.8)")
+    print(f"  Sheet            : {SHEET_ID}")
+    print(f"{'='*60}\n")
+
+
+if __name__ == "__main__":
+    main()
